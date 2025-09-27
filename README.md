@@ -1,75 +1,51 @@
-# 🎧 Autonomous DJ System
+# 🎧 DJ AI System
 
-**Professional DJ software with autonomous mixing capabilities and Traktor Pro integration**
+Professional autonomous DJ application with AI-powered mixing decisions and Traktor Pro integration.
 
-Built using **Claude Code** with specialized **MCP agents** for comprehensive DJ functionality.
+## ✨ Features
 
-## 🌟 Features
-
-### 🎛️ **Professional MIDI Integration**
-- **Real-time Traktor Pro communication** via custom MIDI driver
-- **Low-latency control** (<10ms for time-critical operations)
-- **Comprehensive mapping** for decks, mixer, effects, and modifiers
-- **Hardware controller support** with automatic device detection
-
-### 🤖 **Intelligent Autonomous DJ**
-- **Advanced audio analysis** (BPM, key detection, energy assessment)
-- **Harmonic mixing** using Camelot wheel progression
-- **Professional techniques** (beatmatching, EQ transitions, filter sweeps)
-- **Adaptive behavior** based on crowd response and user feedback
-- **Multiple DJ profiles** (Radio, Club, Mobile, Underground)
-
-### 📱 **Modern GUI Interface**
-- **Dark theme** optimized for DJ booth environments
-- **Real-time status monitoring** for decks and mixer
-- **Intuitive controls** for all DJ functions
-- **Manual override** capabilities for experienced DJs
-- **Professional layout** with responsive design
-
-### 🔧 **Advanced Capabilities**
-- **Smart track selection** with compatibility scoring
-- **Context-aware programming** (time-based, event-type adaptation)
-- **Real-time performance monitoring** and optimization
-- **Error recovery** and connection management
-- **Extensible architecture** for custom extensions
+- **🤖 AI-Powered Mixing**: Uses OpenRouter's free LLM models for intelligent DJ decisions
+- **🎛️ Traktor Pro Integration**: Direct MIDI control via macOS IAC Driver
+- **💬 Real-time Chat**: Natural language interaction with AI DJ
+- **🎵 Smart Music Selection**: Automatic library scanning with BPM/key matching
+- **🚨 Safety First**: Emergency stops, human overrides, volume limiting
+- **📱 Simple GUI**: One-click startup, intuitive controls
 
 ## 🚀 Quick Start
 
-### 1. **Installation**
+### Prerequisites
+1. **macOS** with Audio MIDI Setup
+2. **Traktor Pro 3** (running)
+3. **Music Library** at `/Users/Fiore/Music`
+4. **OpenRouter API Key** (free at [openrouter.ai](https://openrouter.ai))
 
+### Installation
 ```bash
-# Clone or navigate to the project directory
-cd /Users/Fiore/dj/
+# Clone repository
+git clone https://github.com/Fiore0312/dj.git
+cd dj
 
-# Run setup script
-python setup.py
+# Install dependencies
+pip install -r requirements_simple.txt
 
-# Activate virtual environment
-source dj_env/bin/activate  # macOS/Linux
-# or
-dj_env\Scripts\activate     # Windows
+# Set API key
+export OPENROUTER_API_KEY="your-key-here"
+
+# Configure macOS IAC Driver
+# 1. Open Audio MIDI Setup
+# 2. Window > Show MIDI Studio
+# 3. Double-click IAC Driver
+# 4. Check "Device is online"
+# 5. Ensure "Bus 1" exists
 ```
 
-### 2. **Basic GUI Test**
-
+### Launch
 ```bash
-# Test the GUI without dependencies
-python examples/simple_gui_test.py
+# Start DJ AI System
+python dj_ai.py
 ```
 
-### 3. **Full Integration Demo**
-
-```bash
-# See all components working together
-python examples/integration_demo.py
-```
-
-### 4. **Run Complete System**
-
-```bash
-# Launch the full DJ system
-python main.py
-```
+That's it! The GUI will guide you through the rest.
 
 ## 📁 Project Structure
 

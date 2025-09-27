@@ -1,0 +1,928 @@
+# TRAKTOR PRO 3 AI DJ AGENT MAPPING SPECIFICATION
+# Complete MIDI Control Mapping for AI DJ Agent System
+# Device: Generic MIDI Controller via macOS IAC Driver
+# Version: 1.0
+# Created: 2025-09-27
+
+## DEVICE CONFIGURATION
+Device Name: AI DJ Agent Controller
+Device Type: Generic MIDI
+Input Device: Bus 1 (IAC Driver Bus 1)
+Output Device: Bus 1 (IAC Driver Bus 1)
+MIDI Channels: 1-4
+Comment: Bidirectional MIDI communication for AI DJ agent control
+
+## CHANNEL 1 - AI AGENT CONTROL (INPUT)
+# Primary control channel for AI agent commands
+
+### MASTER CONTROLS
+Assignment: Master Volume
+MIDI Channel: 1
+MIDI CC: 7
+Type: Fader/Knob
+Range: 0-127
+Traktor Command: Mixer.Main.Volume
+Comment: Master output volume control
+
+Assignment: Crossfader
+MIDI Channel: 1
+MIDI CC: 28
+Type: Fader
+Range: 0-127
+Traktor Command: Mixer.Crossfader
+Comment: Main crossfader position
+
+Assignment: Crossfader Curve
+MIDI Channel: 1
+MIDI CC: 29
+Type: Knob
+Range: 0-127
+Traktor Command: Mixer.Crossfader.Curve
+Comment: Crossfader curve adjustment
+
+### DECK A CONTROLS (Channel 1)
+Assignment: Deck A Volume
+MIDI Channel: 1
+MIDI CC: 8
+Type: Fader
+Range: 0-127
+Traktor Command: Deck.A.Volume
+Comment: Deck A channel volume
+
+Assignment: Deck A EQ High
+MIDI Channel: 1
+MIDI CC: 12
+Type: Knob
+Range: 0-127 (Center: 64)
+Traktor Command: Deck.A.EQ.High
+Comment: Deck A high frequency EQ
+
+Assignment: Deck A EQ Mid
+MIDI Channel: 1
+MIDI CC: 16
+Type: Knob
+Range: 0-127 (Center: 64)
+Traktor Command: Deck.A.EQ.Mid
+Comment: Deck A mid frequency EQ
+
+Assignment: Deck A EQ Low
+MIDI Channel: 1
+MIDI CC: 20
+Type: Knob
+Range: 0-127 (Center: 64)
+Traktor Command: Deck.A.EQ.Low
+Comment: Deck A low frequency EQ
+
+Assignment: Deck A Filter
+MIDI Channel: 1
+MIDI CC: 24
+Type: Knob
+Range: 0-127 (Center: 64)
+Traktor Command: Deck.A.Filter
+Comment: Deck A filter control
+
+Assignment: Deck A Play/Pause
+MIDI Channel: 1
+MIDI CC: 30
+Type: Button
+Range: 0-127 (0=Pause, 127=Play)
+Traktor Command: Deck.A.Play
+Comment: Deck A transport control
+
+Assignment: Deck A Cue
+MIDI Channel: 1
+MIDI CC: 34
+Type: Button
+Range: 0-127 (0=Off, 127=On)
+Traktor Command: Deck.A.Cue
+Comment: Deck A cue point
+
+Assignment: Deck A Sync
+MIDI Channel: 1
+MIDI CC: 38
+Type: Button
+Range: 0-127
+Traktor Command: Deck.A.Sync
+Comment: Deck A beat sync
+
+Assignment: Deck A Tempo
+MIDI Channel: 1
+MIDI CC: 42
+Type: Fader
+Range: 0-127 (Center: 64)
+Traktor Command: Deck.A.Tempo
+Comment: Deck A tempo fader
+
+Assignment: Deck A Load Track
+MIDI Channel: 1
+MIDI CC: 46
+Type: Button
+Range: 0-127
+Traktor Command: Deck.A.Load.Selected
+Comment: Load selected track to Deck A
+
+### DECK B CONTROLS (Channel 1)
+Assignment: Deck B Volume
+MIDI Channel: 1
+MIDI CC: 9
+Type: Fader
+Range: 0-127
+Traktor Command: Deck.B.Volume
+Comment: Deck B channel volume
+
+Assignment: Deck B EQ High
+MIDI Channel: 1
+MIDI CC: 13
+Type: Knob
+Range: 0-127 (Center: 64)
+Traktor Command: Deck.B.EQ.High
+Comment: Deck B high frequency EQ
+
+Assignment: Deck B EQ Mid
+MIDI Channel: 1
+MIDI CC: 17
+Type: Knob
+Range: 0-127 (Center: 64)
+Traktor Command: Deck.B.EQ.Mid
+Comment: Deck B mid frequency EQ
+
+Assignment: Deck B EQ Low
+MIDI Channel: 1
+MIDI CC: 21
+Type: Knob
+Range: 0-127 (Center: 64)
+Traktor Command: Deck.B.EQ.Low
+Comment: Deck B low frequency EQ
+
+Assignment: Deck B Filter
+MIDI Channel: 1
+MIDI CC: 25
+Type: Knob
+Range: 0-127 (Center: 64)
+Traktor Command: Deck.B.Filter
+Comment: Deck B filter control
+
+Assignment: Deck B Play/Pause
+MIDI Channel: 1
+MIDI CC: 31
+Type: Button
+Range: 0-127 (0=Pause, 127=Play)
+Traktor Command: Deck.B.Play
+Comment: Deck B transport control
+
+Assignment: Deck B Cue
+MIDI Channel: 1
+MIDI CC: 35
+Type: Button
+Range: 0-127 (0=Off, 127=On)
+Traktor Command: Deck.B.Cue
+Comment: Deck B cue point
+
+Assignment: Deck B Sync
+MIDI Channel: 1
+MIDI CC: 39
+Type: Button
+Range: 0-127
+Traktor Command: Deck.B.Sync
+Comment: Deck B beat sync
+
+Assignment: Deck B Tempo
+MIDI Channel: 1
+MIDI CC: 43
+Type: Fader
+Range: 0-127 (Center: 64)
+Traktor Command: Deck.B.Tempo
+Comment: Deck B tempo fader
+
+Assignment: Deck B Load Track
+MIDI Channel: 1
+MIDI CC: 47
+Type: Button
+Range: 0-127
+Traktor Command: Deck.B.Load.Selected
+Comment: Load selected track to Deck B
+
+### DECK C CONTROLS (Channel 1)
+Assignment: Deck C Volume
+MIDI Channel: 1
+MIDI CC: 10
+Type: Fader
+Range: 0-127
+Traktor Command: Deck.C.Volume
+Comment: Deck C channel volume
+
+Assignment: Deck C EQ High
+MIDI Channel: 1
+MIDI CC: 14
+Type: Knob
+Range: 0-127 (Center: 64)
+Traktor Command: Deck.C.EQ.High
+Comment: Deck C high frequency EQ
+
+Assignment: Deck C EQ Mid
+MIDI Channel: 1
+MIDI CC: 18
+Type: Knob
+Range: 0-127 (Center: 64)
+Traktor Command: Deck.C.EQ.Mid
+Comment: Deck C mid frequency EQ
+
+Assignment: Deck C EQ Low
+MIDI Channel: 1
+MIDI CC: 22
+Type: Knob
+Range: 0-127 (Center: 64)
+Traktor Command: Deck.C.EQ.Low
+Comment: Deck C low frequency EQ
+
+Assignment: Deck C Filter
+MIDI Channel: 1
+MIDI CC: 26
+Type: Knob
+Range: 0-127 (Center: 64)
+Traktor Command: Deck.C.Filter
+Comment: Deck C filter control
+
+Assignment: Deck C Play/Pause
+MIDI Channel: 1
+MIDI CC: 32
+Type: Button
+Range: 0-127 (0=Pause, 127=Play)
+Traktor Command: Deck.C.Play
+Comment: Deck C transport control
+
+Assignment: Deck C Cue
+MIDI Channel: 1
+MIDI CC: 36
+Type: Button
+Range: 0-127 (0=Off, 127=On)
+Traktor Command: Deck.C.Cue
+Comment: Deck C cue point
+
+Assignment: Deck C Sync
+MIDI Channel: 1
+MIDI CC: 40
+Type: Button
+Range: 0-127
+Traktor Command: Deck.C.Sync
+Comment: Deck C beat sync
+
+Assignment: Deck C Tempo
+MIDI Channel: 1
+MIDI CC: 44
+Type: Fader
+Range: 0-127 (Center: 64)
+Traktor Command: Deck.C.Tempo
+Comment: Deck C tempo fader
+
+Assignment: Deck C Load Track
+MIDI Channel: 1
+MIDI CC: 48
+Type: Button
+Range: 0-127
+Traktor Command: Deck.C.Load.Selected
+Comment: Load selected track to Deck C
+
+### DECK D CONTROLS (Channel 1)
+Assignment: Deck D Volume
+MIDI Channel: 1
+MIDI CC: 11
+Type: Fader
+Range: 0-127
+Traktor Command: Deck.D.Volume
+Comment: Deck D channel volume
+
+Assignment: Deck D EQ High
+MIDI Channel: 1
+MIDI CC: 15
+Type: Knob
+Range: 0-127 (Center: 64)
+Traktor Command: Deck.D.EQ.High
+Comment: Deck D high frequency EQ
+
+Assignment: Deck D EQ Mid
+MIDI Channel: 1
+MIDI CC: 19
+Type: Knob
+Range: 0-127 (Center: 64)
+Traktor Command: Deck.D.EQ.Mid
+Comment: Deck D mid frequency EQ
+
+Assignment: Deck D EQ Low
+MIDI Channel: 1
+MIDI CC: 23
+Type: Knob
+Range: 0-127 (Center: 64)
+Traktor Command: Deck.D.EQ.Low
+Comment: Deck D low frequency EQ
+
+Assignment: Deck D Filter
+MIDI Channel: 1
+MIDI CC: 27
+Type: Knob
+Range: 0-127 (Center: 64)
+Traktor Command: Deck.D.Filter
+Comment: Deck D filter control
+
+Assignment: Deck D Play/Pause
+MIDI Channel: 1
+MIDI CC: 33
+Type: Button
+Range: 0-127 (0=Pause, 127=Play)
+Traktor Command: Deck.D.Play
+Comment: Deck D transport control
+
+Assignment: Deck D Cue
+MIDI Channel: 1
+MIDI CC: 37
+Type: Button
+Range: 0-127 (0=Off, 127=On)
+Traktor Command: Deck.D.Cue
+Comment: Deck D cue point
+
+Assignment: Deck D Sync
+MIDI Channel: 1
+MIDI CC: 41
+Type: Button
+Range: 0-127
+Traktor Command: Deck.D.Sync
+Comment: Deck D beat sync
+
+Assignment: Deck D Tempo
+MIDI Channel: 1
+MIDI CC: 45
+Type: Fader
+Range: 0-127 (Center: 64)
+Traktor Command: Deck.D.Tempo
+Comment: Deck D tempo fader
+
+Assignment: Deck D Load Track
+MIDI Channel: 1
+MIDI CC: 49
+Type: Button
+Range: 0-127
+Traktor Command: Deck.D.Load.Selected
+Comment: Load selected track to Deck D
+
+## CHANNEL 2 - STATUS FEEDBACK (OUTPUT)
+# Real-time status information sent back to AI agent
+
+### DECK STATUS FEEDBACK
+Assignment: Deck A BPM
+MIDI Channel: 2
+MIDI CC: 50
+Type: Output
+Range: 0-127 (scaled from actual BPM)
+Traktor Command: Deck.A.Tempo.BPM
+Comment: Current BPM of Deck A
+
+Assignment: Deck A Track Position
+MIDI Channel: 2
+MIDI CC: 54
+Type: Output
+Range: 0-127 (0=start, 127=end)
+Traktor Command: Deck.A.Track.Position
+Comment: Current track position as percentage
+
+Assignment: Deck A VU Meter Left
+MIDI Channel: 2
+MIDI CC: 58
+Type: Output
+Range: 0-127
+Traktor Command: Deck.A.VU.Left
+Comment: Left channel VU meter level
+
+Assignment: Deck A VU Meter Right
+MIDI Channel: 2
+MIDI CC: 62
+Type: Output
+Range: 0-127
+Traktor Command: Deck.A.VU.Right
+Comment: Right channel VU meter level
+
+Assignment: Deck A Beat Phase
+MIDI Channel: 2
+MIDI CC: 66
+Type: Output
+Range: 0-127
+Traktor Command: Deck.A.Beat.Phase
+Comment: Current beat phase position
+
+Assignment: Deck A Key Detection
+MIDI Channel: 2
+MIDI CC: 70
+Type: Output
+Range: 0-127 (scaled)
+Traktor Command: Deck.A.Key
+Comment: Detected musical key
+
+Assignment: Deck B BPM
+MIDI Channel: 2
+MIDI CC: 51
+Type: Output
+Range: 0-127 (scaled from actual BPM)
+Traktor Command: Deck.B.Tempo.BPM
+Comment: Current BPM of Deck B
+
+Assignment: Deck B Track Position
+MIDI Channel: 2
+MIDI CC: 55
+Type: Output
+Range: 0-127 (0=start, 127=end)
+Traktor Command: Deck.B.Track.Position
+Comment: Current track position as percentage
+
+Assignment: Deck B VU Meter Left
+MIDI Channel: 2
+MIDI CC: 59
+Type: Output
+Range: 0-127
+Traktor Command: Deck.B.VU.Left
+Comment: Left channel VU meter level
+
+Assignment: Deck B VU Meter Right
+MIDI Channel: 2
+MIDI CC: 63
+Type: Output
+Range: 0-127
+Traktor Command: Deck.B.VU.Right
+Comment: Right channel VU meter level
+
+Assignment: Deck B Beat Phase
+MIDI Channel: 2
+MIDI CC: 67
+Type: Output
+Range: 0-127
+Traktor Command: Deck.B.Beat.Phase
+Comment: Current beat phase position
+
+Assignment: Deck B Key Detection
+MIDI Channel: 2
+MIDI CC: 71
+Type: Output
+Range: 0-127 (scaled)
+Traktor Command: Deck.B.Key
+Comment: Detected musical key
+
+Assignment: Deck C BPM
+MIDI Channel: 2
+MIDI CC: 52
+Type: Output
+Range: 0-127 (scaled from actual BPM)
+Traktor Command: Deck.C.Tempo.BPM
+Comment: Current BPM of Deck C
+
+Assignment: Deck C Track Position
+MIDI Channel: 2
+MIDI CC: 56
+Type: Output
+Range: 0-127 (0=start, 127=end)
+Traktor Command: Deck.C.Track.Position
+Comment: Current track position as percentage
+
+Assignment: Deck C VU Meter Left
+MIDI Channel: 2
+MIDI CC: 60
+Type: Output
+Range: 0-127
+Traktor Command: Deck.C.VU.Left
+Comment: Left channel VU meter level
+
+Assignment: Deck C VU Meter Right
+MIDI Channel: 2
+MIDI CC: 64
+Type: Output
+Range: 0-127
+Traktor Command: Deck.C.VU.Right
+Comment: Right channel VU meter level
+
+Assignment: Deck C Beat Phase
+MIDI Channel: 2
+MIDI CC: 68
+Type: Output
+Range: 0-127
+Traktor Command: Deck.C.Beat.Phase
+Comment: Current beat phase position
+
+Assignment: Deck C Key Detection
+MIDI Channel: 2
+MIDI CC: 72
+Type: Output
+Range: 0-127 (scaled)
+Traktor Command: Deck.C.Key
+Comment: Detected musical key
+
+Assignment: Deck D BPM
+MIDI Channel: 2
+MIDI CC: 53
+Type: Output
+Range: 0-127 (scaled from actual BPM)
+Traktor Command: Deck.D.Tempo.BPM
+Comment: Current BPM of Deck D
+
+Assignment: Deck D Track Position
+MIDI Channel: 2
+MIDI CC: 57
+Type: Output
+Range: 0-127 (0=start, 127=end)
+Traktor Command: Deck.D.Track.Position
+Comment: Current track position as percentage
+
+Assignment: Deck D VU Meter Left
+MIDI Channel: 2
+MIDI CC: 61
+Type: Output
+Range: 0-127
+Traktor Command: Deck.D.VU.Left
+Comment: Left channel VU meter level
+
+Assignment: Deck D VU Meter Right
+MIDI Channel: 2
+MIDI CC: 65
+Type: Output
+Range: 0-127
+Traktor Command: Deck.D.VU.Right
+Comment: Right channel VU meter level
+
+Assignment: Deck D Beat Phase
+MIDI Channel: 2
+MIDI CC: 69
+Type: Output
+Range: 0-127
+Traktor Command: Deck.D.Beat.Phase
+Comment: Current beat phase position
+
+Assignment: Deck D Key Detection
+MIDI Channel: 2
+MIDI CC: 73
+Type: Output
+Range: 0-127 (scaled)
+Traktor Command: Deck.D.Key
+Comment: Detected musical key
+
+## CHANNEL 3 - HUMAN OVERRIDE CONTROLS
+# Safety and manual override controls
+
+Assignment: Emergency Stop All
+MIDI Channel: 3
+MIDI CC: 80
+Type: Button
+Range: 0-127 (127=trigger)
+Traktor Command: Global.Panic
+Comment: Emergency stop all playback immediately
+
+Assignment: AI Control Enable/Disable
+MIDI Channel: 3
+MIDI CC: 81
+Type: Button
+Range: 0-127 (0=disable, 127=enable)
+Traktor Command: Modifier.M2
+Comment: Master AI control enable/disable
+
+Assignment: Deck A Manual Override
+MIDI Channel: 3
+MIDI CC: 82
+Type: Button
+Range: 0-127 (0=AI, 127=human)
+Traktor Command: Modifier.M3
+Comment: Deck A manual override toggle
+
+Assignment: Deck B Manual Override
+MIDI Channel: 3
+MIDI CC: 83
+Type: Button
+Range: 0-127 (0=AI, 127=human)
+Traktor Command: Modifier.M4
+Comment: Deck B manual override toggle
+
+Assignment: Deck C Manual Override
+MIDI Channel: 3
+MIDI CC: 84
+Type: Button
+Range: 0-127 (0=AI, 127=human)
+Traktor Command: Modifier.M5
+Comment: Deck C manual override toggle
+
+Assignment: Deck D Manual Override
+MIDI Channel: 3
+MIDI CC: 85
+Type: Button
+Range: 0-127 (0=AI, 127=human)
+Traktor Command: Modifier.M6
+Comment: Deck D manual override toggle
+
+Assignment: Master Volume Limit
+MIDI Channel: 3
+MIDI CC: 86
+Type: Knob
+Range: 0-127
+Traktor Command: Global.Volume.Limit
+Comment: Maximum allowed master volume
+
+Assignment: Recording Start/Stop
+MIDI Channel: 3
+MIDI CC: 87
+Type: Button
+Range: 0-127
+Traktor Command: Global.Record
+Comment: Start/stop audio recording
+
+Assignment: Headphone Volume
+MIDI Channel: 3
+MIDI CC: 88
+Type: Knob
+Range: 0-127
+Traktor Command: Mixer.Headphone.Volume
+Comment: Headphone monitoring volume
+
+Assignment: Headphone Mix
+MIDI Channel: 3
+MIDI CC: 89
+Type: Knob
+Range: 0-127 (0=cue, 127=master)
+Traktor Command: Mixer.Headphone.Mix
+Comment: Headphone cue/master mix
+
+## CHANNEL 4 - EFFECTS CONTROL
+# Effects units and parameters
+
+### FX UNIT 1
+Assignment: FX1 Dry/Wet
+MIDI Channel: 4
+MIDI CC: 90
+Type: Knob
+Range: 0-127
+Traktor Command: FX.1.DryWet
+Comment: FX Unit 1 dry/wet mix
+
+Assignment: FX1 Parameter 1
+MIDI Channel: 4
+MIDI CC: 94
+Type: Knob
+Range: 0-127
+Traktor Command: FX.1.Parameter.1
+Comment: FX Unit 1 parameter 1
+
+Assignment: FX1 Parameter 2
+MIDI Channel: 4
+MIDI CC: 98
+Type: Knob
+Range: 0-127
+Traktor Command: FX.1.Parameter.2
+Comment: FX Unit 1 parameter 2
+
+Assignment: FX1 Parameter 3
+MIDI Channel: 4
+MIDI CC: 102
+Type: Knob
+Range: 0-127
+Traktor Command: FX.1.Parameter.3
+Comment: FX Unit 1 parameter 3
+
+Assignment: FX1 On/Off
+MIDI Channel: 4
+MIDI CC: 106
+Type: Button
+Range: 0-127
+Traktor Command: FX.1.Enabled
+Comment: FX Unit 1 enable/disable
+
+### FX UNIT 2
+Assignment: FX2 Dry/Wet
+MIDI Channel: 4
+MIDI CC: 91
+Type: Knob
+Range: 0-127
+Traktor Command: FX.2.DryWet
+Comment: FX Unit 2 dry/wet mix
+
+Assignment: FX2 Parameter 1
+MIDI Channel: 4
+MIDI CC: 95
+Type: Knob
+Range: 0-127
+Traktor Command: FX.2.Parameter.1
+Comment: FX Unit 2 parameter 1
+
+Assignment: FX2 Parameter 2
+MIDI Channel: 4
+MIDI CC: 99
+Type: Knob
+Range: 0-127
+Traktor Command: FX.2.Parameter.2
+Comment: FX Unit 2 parameter 2
+
+Assignment: FX2 Parameter 3
+MIDI Channel: 4
+MIDI CC: 103
+Type: Knob
+Range: 0-127
+Traktor Command: FX.2.Parameter.3
+Comment: FX Unit 2 parameter 3
+
+Assignment: FX2 On/Off
+MIDI Channel: 4
+MIDI CC: 107
+Type: Button
+Range: 0-127
+Traktor Command: FX.2.Enabled
+Comment: FX Unit 2 enable/disable
+
+### FX UNIT 3
+Assignment: FX3 Dry/Wet
+MIDI Channel: 4
+MIDI CC: 92
+Type: Knob
+Range: 0-127
+Traktor Command: FX.3.DryWet
+Comment: FX Unit 3 dry/wet mix
+
+Assignment: FX3 Parameter 1
+MIDI Channel: 4
+MIDI CC: 96
+Type: Knob
+Range: 0-127
+Traktor Command: FX.3.Parameter.1
+Comment: FX Unit 3 parameter 1
+
+Assignment: FX3 Parameter 2
+MIDI Channel: 4
+MIDI CC: 100
+Type: Knob
+Range: 0-127
+Traktor Command: FX.3.Parameter.2
+Comment: FX Unit 3 parameter 2
+
+Assignment: FX3 Parameter 3
+MIDI Channel: 4
+MIDI CC: 104
+Type: Knob
+Range: 0-127
+Traktor Command: FX.3.Parameter.3
+Comment: FX Unit 3 parameter 3
+
+Assignment: FX3 On/Off
+MIDI Channel: 4
+MIDI CC: 108
+Type: Button
+Range: 0-127
+Traktor Command: FX.3.Enabled
+Comment: FX Unit 3 enable/disable
+
+### FX UNIT 4
+Assignment: FX4 Dry/Wet
+MIDI Channel: 4
+MIDI CC: 93
+Type: Knob
+Range: 0-127
+Traktor Command: FX.4.DryWet
+Comment: FX Unit 4 dry/wet mix
+
+Assignment: FX4 Parameter 1
+MIDI Channel: 4
+MIDI CC: 97
+Type: Knob
+Range: 0-127
+Traktor Command: FX.4.Parameter.1
+Comment: FX Unit 4 parameter 1
+
+Assignment: FX4 Parameter 2
+MIDI Channel: 4
+MIDI CC: 101
+Type: Knob
+Range: 0-127
+Traktor Command: FX.4.Parameter.2
+Comment: FX Unit 4 parameter 2
+
+Assignment: FX4 Parameter 3
+MIDI Channel: 4
+MIDI CC: 105
+Type: Knob
+Range: 0-127
+Traktor Command: FX.4.Parameter.3
+Comment: FX Unit 4 parameter 3
+
+Assignment: FX4 On/Off
+MIDI Channel: 4
+MIDI CC: 109
+Type: Button
+Range: 0-127
+Traktor Command: FX.4.Enabled
+Comment: FX Unit 4 enable/disable
+
+## LOOP CONTROLS (Channel 1 with Modifiers)
+# Loop controls using modifier M1 as shift
+
+Assignment: Deck A Loop In (Shift)
+MIDI Channel: 1
+MIDI CC: 110
+Type: Button
+Range: 0-127
+Modifier: M1=1
+Traktor Command: Deck.A.Loop.In
+Comment: Set loop in point for Deck A
+
+Assignment: Deck A Loop Out (Shift)
+MIDI Channel: 1
+MIDI CC: 111
+Type: Button
+Range: 0-127
+Modifier: M1=1
+Traktor Command: Deck.A.Loop.Out
+Comment: Set loop out point for Deck A
+
+Assignment: Deck A Loop Active (Shift)
+MIDI Channel: 1
+MIDI CC: 112
+Type: Button
+Range: 0-127
+Modifier: M1=1
+Traktor Command: Deck.A.Loop.Active
+Comment: Activate/deactivate loop for Deck A
+
+Assignment: Deck A Loop Size (Shift)
+MIDI Channel: 1
+MIDI CC: 113
+Type: Knob
+Range: 0-127
+Modifier: M1=1
+Traktor Command: Deck.A.Loop.Size
+Comment: Loop size adjustment for Deck A
+
+## HOT CUES (Channel 1 with Modifiers)
+# Hot cue controls using modifier M1 as shift
+
+Assignment: Deck A Hot Cue 1 (Shift)
+MIDI Channel: 1
+MIDI CC: 114
+Type: Button
+Range: 0-127
+Modifier: M1=1
+Traktor Command: Deck.A.Hotcue.1
+Comment: Hot cue 1 for Deck A
+
+Assignment: Deck A Hot Cue 2 (Shift)
+MIDI Channel: 1
+MIDI CC: 115
+Type: Button
+Range: 0-127
+Modifier: M1=1
+Traktor Command: Deck.A.Hotcue.2
+Comment: Hot cue 2 for Deck A
+
+Assignment: Deck A Hot Cue 3 (Shift)
+MIDI Channel: 1
+MIDI CC: 116
+Type: Button
+Range: 0-127
+Modifier: M1=1
+Traktor Command: Deck.A.Hotcue.3
+Comment: Hot cue 3 for Deck A
+
+Assignment: Deck A Hot Cue 4 (Shift)
+MIDI Channel: 1
+MIDI CC: 117
+Type: Button
+Range: 0-127
+Modifier: M1=1
+Traktor Command: Deck.A.Hotcue.4
+Comment: Hot cue 4 for Deck A
+
+## MODIFIER ASSIGNMENTS
+# System modifiers for advanced functionality
+
+Assignment: Shift Modifier
+MIDI Channel: 1
+MIDI CC: 127
+Type: Button
+Range: 0-127
+Traktor Command: Modifier.M1
+Interaction Mode: Hold
+Comment: Shift function for secondary controls
+
+Assignment: AI Enable Modifier
+MIDI Channel: 3
+MIDI CC: 81
+Type: Button
+Range: 0-127
+Traktor Command: Modifier.M2
+Interaction Mode: Toggle
+Comment: AI control system enable/disable
+
+## SAFETY FEATURES
+# Built-in safety mechanisms
+
+1. Volume Limiting: Master volume cannot exceed value set by CC 86
+2. Emergency Stop: CC 80 immediately stops all playback
+3. Manual Override: Individual deck override toggles
+4. Audio Level Monitoring: Continuous VU meter feedback
+5. Beat Phase Tracking: Real-time beat alignment monitoring
+
+## COMPATIBILITY NOTES
+- Designed for Traktor Pro 3 and newer versions
+- Requires macOS IAC Driver for MIDI communication
+- Compatible with all Traktor Pro 3 audio interfaces
+- Supports both internal and external audio routing
+- Optimized for low-latency MIDI communication
+
+## END OF MAPPING SPECIFICATION

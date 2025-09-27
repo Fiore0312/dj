@@ -1,0 +1,482 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<TraktorSettings>
+  <Preferences>
+    <ControllerManager>
+      <DeviceSetups>
+        <DeviceSetup DeviceVendorId="65535" DeviceProductId="65535" DeviceIsInput="1" DeviceIsOutput="1">
+          <DeviceName Value="AI DJ Agent Controller" />
+          <DeviceId Value="AI_DJ_Agent" />
+          <DevicePortIn Value="Bus 1" />
+          <DevicePortOut Value="Bus 1" />
+          <DeviceInPorts Count="1">
+            <DeviceInPort>
+              <Name Value="Bus 1" />
+              <Enabled Value="1" />
+            </DeviceInPort>
+          </DeviceInPorts>
+          <DeviceOutPorts Count="1">
+            <DeviceOutPort>
+              <Name Value="Bus 1" />
+              <Enabled Value="1" />
+            </DeviceOutPort>
+          </DeviceOutPorts>
+          <Mappings Count="200">
+
+            <!-- AI AGENT CONTROL - CHANNEL 1 -->
+            <!-- Deck A Volume -->
+            <Mapping>
+              <MidiNoteKind Value="CC" />
+              <MidiCtrl Value="7" />
+              <MidiChn Value="1" />
+              <Assignment Value="FX.1.Volume" />
+              <Response Value="None" />
+              <Invert Value="0" />
+              <SoftTakeover Value="1" />
+              <AutoReset Value="0" />
+              <MidiRangeLo Value="0" />
+              <MidiRangeHi Value="127" />
+              <ControllerRangeLo Value="0.0" />
+              <ControllerRangeHi Value="1.0" />
+            </Mapping>
+
+            <!-- Deck B Volume -->
+            <Mapping>
+              <MidiNoteKind Value="CC" />
+              <MidiCtrl Value="8" />
+              <MidiChn Value="1" />
+              <Assignment Value="FX.2.Volume" />
+              <Response Value="None" />
+              <Invert Value="0" />
+              <SoftTakeover Value="1" />
+              <AutoReset Value="0" />
+              <MidiRangeLo Value="0" />
+              <MidiRangeHi Value="127" />
+              <ControllerRangeLo Value="0.0" />
+              <ControllerRangeHi Value="1.0" />
+            </Mapping>
+
+            <!-- Deck C Volume -->
+            <Mapping>
+              <MidiNoteKind Value="CC" />
+              <MidiCtrl Value="9" />
+              <MidiChn Value="1" />
+              <Assignment Value="FX.3.Volume" />
+              <Response Value="None" />
+              <Invert Value="0" />
+              <SoftTakeover Value="1" />
+              <AutoReset Value="0" />
+              <MidiRangeLo Value="0" />
+              <MidiRangeHi Value="127" />
+              <ControllerRangeLo Value="0.0" />
+              <ControllerRangeHi Value="1.0" />
+            </Mapping>
+
+            <!-- Deck D Volume -->
+            <Mapping>
+              <MidiNoteKind Value="CC" />
+              <MidiCtrl Value="10" />
+              <MidiChn Value="1" />
+              <Assignment Value="FX.4.Volume" />
+              <Response Value="None" />
+              <Invert Value="0" />
+              <SoftTakeover Value="1" />
+              <AutoReset Value="0" />
+              <MidiRangeLo Value="0" />
+              <MidiRangeHi Value="127" />
+              <ControllerRangeLo Value="0.0" />
+              <ControllerRangeHi Value="1.0" />
+            </Mapping>
+
+            <!-- Crossfader -->
+            <Mapping>
+              <MidiNoteKind Value="CC" />
+              <MidiCtrl Value="11" />
+              <MidiChn Value="1" />
+              <Assignment Value="Mixer.Crossfader" />
+              <Response Value="None" />
+              <Invert Value="0" />
+              <SoftTakeover Value="1" />
+              <AutoReset Value="0" />
+              <MidiRangeLo Value="0" />
+              <MidiRangeHi Value="127" />
+              <ControllerRangeLo Value="0.0" />
+              <ControllerRangeHi Value="1.0" />
+            </Mapping>
+
+            <!-- Deck A EQ High -->
+            <Mapping>
+              <MidiNoteKind Value="CC" />
+              <MidiCtrl Value="12" />
+              <MidiChn Value="1" />
+              <Assignment Value="Deck.A.Filter.High" />
+              <Response Value="None" />
+              <Invert Value="0" />
+              <SoftTakeover Value="1" />
+              <AutoReset Value="0" />
+              <MidiRangeLo Value="0" />
+              <MidiRangeHi Value="127" />
+              <ControllerRangeLo Value="0.0" />
+              <ControllerRangeHi Value="4.0" />
+            </Mapping>
+
+            <!-- Deck A EQ Mid -->
+            <Mapping>
+              <MidiNoteKind Value="CC" />
+              <MidiCtrl Value="13" />
+              <MidiChn Value="1" />
+              <Assignment Value="Deck.A.Filter.Mid" />
+              <Response Value="None" />
+              <Invert Value="0" />
+              <SoftTakeover Value="1" />
+              <AutoReset Value="0" />
+              <MidiRangeLo Value="0" />
+              <MidiRangeHi Value="127" />
+              <ControllerRangeLo Value="0.0" />
+              <ControllerRangeHi Value="4.0" />
+            </Mapping>
+
+            <!-- Deck A EQ Low -->
+            <Mapping>
+              <MidiNoteKind Value="CC" />
+              <MidiCtrl Value="14" />
+              <MidiChn Value="1" />
+              <Assignment Value="Deck.A.Filter.Low" />
+              <Response Value="None" />
+              <Invert Value="0" />
+              <SoftTakeover Value="1" />
+              <AutoReset Value="0" />
+              <MidiRangeLo Value="0" />
+              <MidiRangeHi Value="127" />
+              <ControllerRangeLo Value="0.0" />
+              <ControllerRangeHi Value="4.0" />
+            </Mapping>
+
+            <!-- Deck B EQ High -->
+            <Mapping>
+              <MidiNoteKind Value="CC" />
+              <MidiCtrl Value="15" />
+              <MidiChn Value="1" />
+              <Assignment Value="Deck.B.Filter.High" />
+              <Response Value="None" />
+              <Invert Value="0" />
+              <SoftTakeover Value="1" />
+              <AutoReset Value="0" />
+              <MidiRangeLo Value="0" />
+              <MidiRangeHi Value="127" />
+              <ControllerRangeLo Value="0.0" />
+              <ControllerRangeHi Value="4.0" />
+            </Mapping>
+
+            <!-- Deck B EQ Mid -->
+            <Mapping>
+              <MidiNoteKind Value="CC" />
+              <MidiCtrl Value="16" />
+              <MidiChn Value="1" />
+              <Assignment Value="Deck.B.Filter.Mid" />
+              <Response Value="None" />
+              <Invert Value="0" />
+              <SoftTakeover Value="1" />
+              <AutoReset Value="0" />
+              <MidiRangeLo Value="0" />
+              <MidiRangeHi Value="127" />
+              <ControllerRangeLo Value="0.0" />
+              <ControllerRangeHi Value="4.0" />
+            </Mapping>
+
+            <!-- Deck B EQ Low -->
+            <Mapping>
+              <MidiNoteKind Value="CC" />
+              <MidiCtrl Value="17" />
+              <MidiChn Value="1" />
+              <Assignment Value="Deck.B.Filter.Low" />
+              <Response Value="None" />
+              <Invert Value="0" />
+              <SoftTakeover Value="1" />
+              <AutoReset Value="0" />
+              <MidiRangeLo Value="0" />
+              <MidiRangeHi Value="127" />
+              <ControllerRangeLo Value="0.0" />
+              <ControllerRangeHi Value="4.0" />
+            </Mapping>
+
+            <!-- Deck A Play/Pause -->
+            <Mapping>
+              <MidiNoteKind Value="CC" />
+              <MidiCtrl Value="20" />
+              <MidiChn Value="1" />
+              <Assignment Value="Deck.A.Play" />
+              <Response Value="Trigger" />
+              <Invert Value="0" />
+              <SoftTakeover Value="0" />
+              <AutoReset Value="0" />
+              <MidiRangeLo Value="64" />
+              <MidiRangeHi Value="127" />
+              <ControllerRangeLo Value="0.0" />
+              <ControllerRangeHi Value="1.0" />
+            </Mapping>
+
+            <!-- Deck B Play/Pause -->
+            <Mapping>
+              <MidiNoteKind Value="CC" />
+              <MidiCtrl Value="21" />
+              <MidiChn Value="1" />
+              <Assignment Value="Deck.B.Play" />
+              <Response Value="Trigger" />
+              <Invert Value="0" />
+              <SoftTakeover Value="0" />
+              <AutoReset Value="0" />
+              <MidiRangeLo Value="64" />
+              <MidiRangeHi Value="127" />
+              <ControllerRangeLo Value="0.0" />
+              <ControllerRangeHi Value="1.0" />
+            </Mapping>
+
+            <!-- Deck A Cue -->
+            <Mapping>
+              <MidiNoteKind Value="CC" />
+              <MidiCtrl Value="24" />
+              <MidiChn Value="1" />
+              <Assignment Value="Deck.A.Cue" />
+              <Response Value="Trigger" />
+              <Invert Value="0" />
+              <SoftTakeover Value="0" />
+              <AutoReset Value="0" />
+              <MidiRangeLo Value="64" />
+              <MidiRangeHi Value="127" />
+              <ControllerRangeLo Value="0.0" />
+              <ControllerRangeHi Value="1.0" />
+            </Mapping>
+
+            <!-- Deck B Cue -->
+            <Mapping>
+              <MidiNoteKind Value="CC" />
+              <MidiCtrl Value="25" />
+              <MidiChn Value="1" />
+              <Assignment Value="Deck.B.Cue" />
+              <Response Value="Trigger" />
+              <Invert Value="0" />
+              <SoftTakeover Value="0" />
+              <AutoReset Value="0" />
+              <MidiRangeLo Value="64" />
+              <MidiRangeHi Value="127" />
+              <ControllerRangeLo Value="0.0" />
+              <ControllerRangeHi Value="1.0" />
+            </Mapping>
+
+            <!-- Deck A Sync -->
+            <Mapping>
+              <MidiNoteKind Value="CC" />
+              <MidiCtrl Value="28" />
+              <MidiChn Value="1" />
+              <Assignment Value="Deck.A.Sync" />
+              <Response Value="Trigger" />
+              <Invert Value="0" />
+              <SoftTakeover Value="0" />
+              <AutoReset Value="0" />
+              <MidiRangeLo Value="64" />
+              <MidiRangeHi Value="127" />
+              <ControllerRangeLo Value="0.0" />
+              <ControllerRangeHi Value="1.0" />
+            </Mapping>
+
+            <!-- Deck B Sync -->
+            <Mapping>
+              <MidiNoteKind Value="CC" />
+              <MidiCtrl Value="29" />
+              <MidiChn Value="1" />
+              <Assignment Value="Deck.B.Sync" />
+              <Response Value="Trigger" />
+              <Invert Value="0" />
+              <SoftTakeover Value="0" />
+              <AutoReset Value="0" />
+              <MidiRangeLo Value="64" />
+              <MidiRangeHi Value="127" />
+              <ControllerRangeLo Value="0.0" />
+              <ControllerRangeHi Value="1.0" />
+            </Mapping>
+
+            <!-- STATUS FEEDBACK - CHANNEL 2 (OUTPUT) -->
+            <!-- Deck A BPM Output -->
+            <Mapping>
+              <MidiNoteKind Value="CC" />
+              <MidiCtrl Value="40" />
+              <MidiChn Value="2" />
+              <Assignment Value="Deck.A.Tempo.Absolute" />
+              <Response Value="Output" />
+              <Invert Value="0" />
+              <SoftTakeover Value="0" />
+              <AutoReset Value="0" />
+              <MidiRangeLo Value="0" />
+              <MidiRangeHi Value="127" />
+              <ControllerRangeLo Value="0.5" />
+              <ControllerRangeHi Value="2.0" />
+            </Mapping>
+
+            <!-- Deck B BPM Output -->
+            <Mapping>
+              <MidiNoteKind Value="CC" />
+              <MidiCtrl Value="41" />
+              <MidiChn Value="2" />
+              <Assignment Value="Deck.B.Tempo.Absolute" />
+              <Response Value="Output" />
+              <Invert Value="0" />
+              <SoftTakeover Value="0" />
+              <AutoReset Value="0" />
+              <MidiRangeLo Value="0" />
+              <MidiRangeHi Value="127" />
+              <ControllerRangeLo Value="0.5" />
+              <ControllerRangeHi Value="2.0" />
+            </Mapping>
+
+            <!-- Deck A Track Position -->
+            <Mapping>
+              <MidiNoteKind Value="CC" />
+              <MidiCtrl Value="44" />
+              <MidiChn Value="2" />
+              <Assignment Value="Deck.A.Track.Position" />
+              <Response Value="Output" />
+              <Invert Value="0" />
+              <SoftTakeover Value="0" />
+              <AutoReset Value="0" />
+              <MidiRangeLo Value="0" />
+              <MidiRangeHi Value="127" />
+              <ControllerRangeLo Value="0.0" />
+              <ControllerRangeHi Value="1.0" />
+            </Mapping>
+
+            <!-- Deck B Track Position -->
+            <Mapping>
+              <MidiNoteKind Value="CC" />
+              <MidiCtrl Value="45" />
+              <MidiChn Value="2" />
+              <Assignment Value="Deck.B.Track.Position" />
+              <Response Value="Output" />
+              <Invert Value="0" />
+              <SoftTakeover Value="0" />
+              <AutoReset Value="0" />
+              <MidiRangeLo Value="0" />
+              <MidiRangeHi Value="127" />
+              <ControllerRangeLo Value="0.0" />
+              <ControllerRangeHi Value="1.0" />
+            </Mapping>
+
+            <!-- HUMAN OVERRIDE - CHANNEL 3 -->
+            <!-- Emergency Stop -->
+            <Mapping>
+              <MidiNoteKind Value="CC" />
+              <MidiCtrl Value="80" />
+              <MidiChn Value="3" />
+              <Assignment Value="Mixer.Main.Volume" />
+              <Response Value="Trigger" />
+              <Invert Value="0" />
+              <SoftTakeover Value="0" />
+              <AutoReset Value="1" />
+              <MidiRangeLo Value="127" />
+              <MidiRangeHi Value="127" />
+              <ControllerRangeLo Value="0.0" />
+              <ControllerRangeHi Value="0.0" />
+            </Mapping>
+
+            <!-- Master Volume Override -->
+            <Mapping>
+              <MidiNoteKind Value="CC" />
+              <MidiCtrl Value="85" />
+              <MidiChn Value="3" />
+              <Assignment Value="Mixer.Main.Volume" />
+              <Response Value="None" />
+              <Invert Value="0" />
+              <SoftTakeover Value="1" />
+              <AutoReset Value="0" />
+              <MidiRangeLo Value="0" />
+              <MidiRangeHi Value="127" />
+              <ControllerRangeLo Value="0.0" />
+              <ControllerRangeHi Value="1.0" />
+            </Mapping>
+
+            <!-- Headphone Volume -->
+            <Mapping>
+              <MidiNoteKind Value="CC" />
+              <MidiCtrl Value="90" />
+              <MidiChn Value="3" />
+              <Assignment Value="Mixer.Headphone.Volume" />
+              <Response Value="None" />
+              <Invert Value="0" />
+              <SoftTakeover Value="1" />
+              <AutoReset Value="0" />
+              <MidiRangeLo Value="0" />
+              <MidiRangeHi Value="127" />
+              <ControllerRangeLo Value="0.0" />
+              <ControllerRangeHi Value="1.0" />
+            </Mapping>
+
+            <!-- Headphone Mix -->
+            <Mapping>
+              <MidiNoteKind Value="CC" />
+              <MidiCtrl Value="91" />
+              <MidiChn Value="3" />
+              <Assignment Value="Mixer.Headphone.Mix" />
+              <Response Value="None" />
+              <Invert Value="0" />
+              <SoftTakeover Value="1" />
+              <AutoReset Value="0" />
+              <MidiRangeLo Value="0" />
+              <MidiRangeHi Value="127" />
+              <ControllerRangeLo Value="0.0" />
+              <ControllerRangeHi Value="1.0" />
+            </Mapping>
+
+            <!-- EFFECTS CONTROL - CHANNEL 4 -->
+            <!-- FX Unit 1 Dry/Wet -->
+            <Mapping>
+              <MidiNoteKind Value="CC" />
+              <MidiCtrl Value="100" />
+              <MidiChn Value="4" />
+              <Assignment Value="FX.1.DryWet" />
+              <Response Value="None" />
+              <Invert Value="0" />
+              <SoftTakeover Value="1" />
+              <AutoReset Value="0" />
+              <MidiRangeLo Value="0" />
+              <MidiRangeHi Value="127" />
+              <ControllerRangeLo Value="0.0" />
+              <ControllerRangeHi Value="1.0" />
+            </Mapping>
+
+            <!-- FX Unit 1 Button 1 -->
+            <Mapping>
+              <MidiNoteKind Value="CC" />
+              <MidiCtrl Value="104" />
+              <MidiChn Value="4" />
+              <Assignment Value="FX.1.Button.1" />
+              <Response Value="Toggle" />
+              <Invert Value="0" />
+              <SoftTakeover Value="0" />
+              <AutoReset Value="0" />
+              <MidiRangeLo Value="64" />
+              <MidiRangeHi Value="127" />
+              <ControllerRangeLo Value="0.0" />
+              <ControllerRangeHi Value="1.0" />
+            </Mapping>
+
+            <!-- FX Unit 1 Knob 1 -->
+            <Mapping>
+              <MidiNoteKind Value="CC" />
+              <MidiCtrl Value="108" />
+              <MidiChn Value="4" />
+              <Assignment Value="FX.1.Knob.1" />
+              <Response Value="None" />
+              <Invert Value="0" />
+              <SoftTakeover Value="1" />
+              <AutoReset Value="0" />
+              <MidiRangeLo Value="0" />
+              <MidiRangeHi Value="127" />
+              <ControllerRangeLo Value="0.0" />
+              <ControllerRangeHi Value="1.0" />
+            </Mapping>
+
+          </Mappings>
+        </DeviceSetup>
+      </DeviceSetups>
+    </ControllerManager>
+  </Preferences>
+</TraktorSettings>

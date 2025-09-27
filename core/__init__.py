@@ -1,30 +1,18 @@
 """
 🎛️ Core Module - Autonomous DJ System
-Central components for Claude AI integration and system management
+Central components for OpenRouter AI integration and system management
 """
 
-from .claude_config import (
-    ClaudeConfig, ClaudeModel, DJTaskType, DJTaskConfig,
-    get_config, get_task_config, validate_api_key
-)
-
-from .sdk_master_agent import (
-    SDKMasterAgent, DJContext, AIResponse,
-    get_sdk_master
+from .openrouter_client import (
+    OpenRouterClient, DJContext, AIResponse,
+    get_openrouter_client
 )
 
 __all__ = [
-    'ClaudeConfig',
-    'ClaudeModel',
-    'DJTaskType',
-    'DJTaskConfig',
-    'SDKMasterAgent',
+    'OpenRouterClient',
     'DJContext',
     'AIResponse',
-    'get_config',
-    'get_task_config',
-    'get_sdk_master',
-    'validate_api_key'
+    'get_openrouter_client'
 ]
 
 __version__ = "2.0.0"

@@ -1,0 +1,24 @@
+# DJ AI System - Dipendenze Essenziali
+
+# MIDI Communication
+python-rtmidi>=1.4.9
+mido>=1.2.10
+
+# Music Metadata
+mutagen>=1.46.0
+
+# HTTP Client (OpenRouter) - Sync version for tkinter compatibility
+requests>=2.32.0
+
+# Optional: Audio Analysis
+# librosa>=0.9.0  # Uncomment for advanced audio analysis
+# essentia>=2.1b1  # Uncomment for professional audio features
+
+# GUI is built-in with tkinter (included in Python)
+# Async is built-in with asyncio (included in Python 3.7+)
+# JSON, pathlib, threading are built-in
+
+# Development (optional)
+# pytest>=7.0.0
+# black>=22.0.0
+# flake8>=4.0.0

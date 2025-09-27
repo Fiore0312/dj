@@ -13,9 +13,21 @@ requests>=2.32.0
 # Configuration Management
 pydantic-settings>=2.10.0
 
-# Optional: Audio Analysis
-# librosa>=0.9.0  # Uncomment for advanced audio analysis
-# essentia>=2.1b1  # Uncomment for professional audio features
+# Audio Analysis for Autonomous DJ
+librosa>=0.10.0
+essentia>=2.1b6
+scipy>=1.9.0
+numpy>=1.21.0
+
+# Machine Learning for Decision Engine
+scikit-learn>=1.1.0
+
+# Real-time Audio Processing
+sounddevice>=0.4.5
+# pyaudio>=0.2.11  # Alternative audio interface (commented for compatibility)
+
+# Audio Features and Signal Processing
+librosa[display]>=0.10.0  # Include visualization components
 
 # GUI is built-in with tkinter (included in Python)
 # Async is built-in with asyncio (included in Python 3.7+)

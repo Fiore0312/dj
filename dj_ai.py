@@ -184,6 +184,9 @@ def launch_gui():
 
     except ImportError as e:
         print(f"❌ Errore import GUI: {e}")
+        print("🔧 Debug traceback completo:")
+        import traceback
+        traceback.print_exc()
         print("🔧 Verifica che tutti i moduli GUI siano presenti")
         return False
     except Exception as e:

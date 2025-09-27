@@ -1,53 +1,95 @@
 #!/usr/bin/env python3
 """
-🤖 AI DJ Agent - Agente DJ Intelligente Semplificato
-Agente DJ che prende decisioni musicali intelligenti usando OpenRouter LLM
+🤖 Autonomous AI DJ Agent
+Complete autonomous DJ system orchestrating all components
+Executes mixing decisions without human intervention
 """
 
 import asyncio
 import time
 import logging
-from typing import Dict, List, Optional, Any, Tuple
+import threading
+from typing import Dict, List, Optional, Any, Tuple, Callable
 from dataclasses import dataclass, asdict
 import json
-import random
+from enum import Enum
 
-from config import DJConfig, VENUE_TYPES, EVENT_TYPES
-from core.openrouter_client import OpenRouterClient, DJContext, AIResponse
+# Core configuration
+from config import DJConfig, VENUE_TYPES, EVENT_TYPES, get_config
+
+# Autonomous components
+from autonomous_audio_engine import RealTimeAnalyzer, AudioFeatures
+from autonomous_decision_engine import AutonomousDecisionEngine, MixContext, DecisionUrgency
+from autonomous_mixing_controller import AutonomousMixingController, MixParameters, MixTransitionType
+from dj_memory_system import DJMemorySystem, MemoryType
+
+# Legacy components (enhanced)
+from music_library import MusicLibraryScanner, TrackInfo, get_music_scanner
 from traktor_control import TraktorController, DeckID
-from music_library import MusicLibraryScanner, TrackInfo
+
+# AI integration
+try:
+    from core.openrouter_client import OpenRouterClient, DJContext, AIResponse
+    OPENROUTER_AVAILABLE = True
+except ImportError:
+    OPENROUTER_AVAILABLE = False
 
 logger = logging.getLogger(__name__)
 
+class AutonomousMode(Enum):
+    """Autonomous operation modes"""
+    MANUAL = "manual"          # Human control
+    ASSISTED = "assisted"      # AI suggestions + human execution
+    AUTONOMOUS = "autonomous"  # Full AI control
+
+class SessionPhase(Enum):
+    """DJ session phases"""
+    STARTUP = "startup"
+    WARM_UP = "warm_up"
+    BUILDING = "building"
+    PEAK_TIME = "peak_time"
+    WIND_DOWN = "wind_down"
+    CLOSING = "closing"
+
 @dataclass
-class MixSession:
-    """Sessione di mixing DJ"""
+class AutonomousSession:
+    """Complete autonomous DJ session"""
+    session_id: str
     venue_type: str
     event_type: str
-    target_duration: int  # minuti
-    current_track_a: Optional[TrackInfo] = None
-    current_track_b: Optional[TrackInfo] = None
-    next_suggested_track: Optional[TrackInfo] = None
-    session_start: float = 0.0
-    tracks_played: List[str] = None
-    energy_progression: List[int] = None
-    mixing_log: List[Dict] = None
+    target_duration: int  # minutes
+
+    # Session state
+    start_time: float
+    current_phase: SessionPhase = SessionPhase.STARTUP
+    autonomous_mode: AutonomousMode = AutonomousMode.AUTONOMOUS
+
+    # Track management
+    current_track: Optional[TrackInfo] = None
+    next_track: Optional[TrackInfo] = None
+    queue: List[TrackInfo] = None
+    played_tracks: List[str] = None
+
+    # Performance metrics
+    energy_curve: List[float] = None
+    crowd_response: List[float] = None
+    transition_quality: List[float] = None
+
+    # Timing
+    last_transition: Optional[float] = None
+    next_transition_planned: Optional[float] = None
 
     def __post_init__(self):
-        if self.tracks_played is None:
-            self.tracks_played = []
-        if self.energy_progression is None:
-            self.energy_progression = []
-        if self.mixing_log is None:
-            self.mixing_log = []
-
-    def add_track_played(self, track: TrackInfo, energy_level: int):
-        """Aggiungi track alla sessione"""
-        self.tracks_played.append(track.filepath)
-        self.energy_progression.append(energy_level)
-
-        # Log decisione
-        self.mixing_log.append({
+        if self.queue is None:
+            self.queue = []
+        if self.played_tracks is None:
+            self.played_tracks = []
+        if self.energy_curve is None:
+            self.energy_curve = []
+        if self.crowd_response is None:
+            self.crowd_response = []
+        if self.transition_quality is None:
+            self.transition_quality = []
             'timestamp': time.time(),
             'track': track.title,
             'artist': track.artist,

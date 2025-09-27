@@ -53,10 +53,23 @@ class DJConfig:
 
     @classmethod
     def load_from_env(cls) -> 'DJConfig':
-        """Carica configurazione da variabili ambiente"""
+        """Carica configurazione da variabili ambiente e file .env"""
         config = cls()
 
-        # API Key priority: environment > persistent settings > None
+        # Try to load .env file first
+        env_file = Path(__file__).parent / '.env'
+        if env_file.exists():
+            try:
+                with open(env_file, 'r') as f:
+                    for line in f:
+                        line = line.strip()
+                        if line and not line.startswith('#') and '=' in line:
+                            key, value = line.split('=', 1)
+                            os.environ[key.strip()] = value.strip()
+            except Exception as e:
+                print(f"⚠️ Error loading .env file: {e}")
+
+        # API Key priority: environment > .env > persistent settings > None
         config.openrouter_api_key = os.getenv('OPENROUTER_API_KEY')
 
         # Note: Persistent settings loading moved to avoid circular imports

@@ -61,7 +61,25 @@ temp/
 # Claude specific
 .claude/
 
-# API Keys e configurazione sensibile (SICUREZZA)
+# 🔒 SECURITY - NEVER COMMIT API KEYS OR SECRETS!
 .env
+.env.local
+.env.development
+.env.test
+.env.production
 *.key
+*api_key*
+*token*
+*secret*
+*password*
 config_private.py
+secrets.json
+credentials.json
+api_keys.txt
+
+# DJ AI System specific databases and cache
+.dj_library.db
+.dj_cache.json
+dj_memory.db
+*.memory
+audio_analysis_cache/

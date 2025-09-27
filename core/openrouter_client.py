@@ -303,11 +303,19 @@ def get_openrouter_client(api_key: str, model: str = None) -> OpenRouterClient:
 # Test function
 def test_openrouter():
     """Test OpenRouter connection"""
-    import os
+    try:
+        from config import get_config
+        config = get_config()
+        api_key = config.openrouter_api_key
+    except:
+        import os
+        api_key = os.getenv('OPENROUTER_API_KEY')
 
-    api_key = os.getenv('OPENROUTER_API_KEY')
     if not api_key:
-        print("❌ OPENROUTER_API_KEY non impostata")
+        print("❌ OPENROUTER_API_KEY non disponibile")
+        print("   Assicurati di:")
+        print("   1. Aver creato il file .env con: python3 setup_secure.py")
+        print("   2. O impostato: export OPENROUTER_API_KEY='your-key'")
         return
 
     client = get_openrouter_client(api_key)

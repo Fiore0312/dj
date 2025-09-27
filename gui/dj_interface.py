@@ -17,6 +17,7 @@ import json
 # Imports del sistema DJ
 from config import DJConfig, VENUE_TYPES, EVENT_TYPES, get_config, check_system_requirements
 from core.openrouter_client import OpenRouterClient, DJContext, get_openrouter_client
+from core.persistent_config import get_persistent_settings
 from traktor_control import TraktorController, get_traktor_controller, DeckID
 from music_library import MusicLibraryScanner, get_music_scanner
 
@@ -27,9 +28,15 @@ class DJInterface:
 
     def __init__(self):
         """Inizializza interfaccia"""
+        # Load persistent settings first
+        self.persistent_settings = get_persistent_settings()
+
         self.root = tk.Tk()
         self.root.title("🎧 AI DJ System - Powered by OpenRouter")
-        self.root.geometry("1000x700")
+
+        # Use persistent window size
+        window_size = f"{self.persistent_settings.window_width}x{self.persistent_settings.window_height}"
+        self.root.geometry(window_size)
         self.root.configure(bg='#1a1a1a')
 
         # Configurazione
@@ -68,13 +75,42 @@ class DJInterface:
     def _create_interface(self):
         """Crea interfaccia utente"""
 
-        # Style per dark theme
+        # Enhanced dark theme with modern styling
         style = ttk.Style()
         style.theme_use('clam')
-        style.configure('TLabel', background='#1a1a1a', foreground='#ffffff')
-        style.configure('TFrame', background='#1a1a1a')
-        style.configure('TButton', background='#333333', foreground='#ffffff')
-        style.configure('Horizontal.TScale', background='#1a1a1a')
+
+        # Base colors
+        bg_primary = '#1a1a1a'
+        bg_secondary = '#2a2a2a'
+        bg_accent = '#333333'
+        fg_primary = '#ffffff'
+        fg_secondary = '#cccccc'
+        accent_color = '#00ff88'  # DJ green
+        error_color = '#ff4444'
+        warning_color = '#ffaa00'
+
+        # Configure styles
+        style.configure('TLabel', background=bg_primary, foreground=fg_primary, font=('Arial', 9))
+        style.configure('TFrame', background=bg_primary)
+        style.configure('TLabelFrame', background=bg_primary, foreground=fg_primary,
+                       borderwidth=1, relief='solid')
+        style.configure('TButton', background=bg_accent, foreground=fg_primary,
+                       padding=(10, 5), font=('Arial', 9, 'bold'))
+        style.map('TButton',
+                 background=[('active', accent_color), ('pressed', '#006644')])
+        style.configure('Horizontal.TScale', background=bg_primary, troughcolor=bg_secondary)
+        style.configure('TCombobox', fieldbackground=bg_secondary, foreground=fg_primary)
+        style.configure('TEntry', fieldbackground=bg_secondary, foreground=fg_primary)
+
+        # Custom styles for status indicators
+        style.configure('Success.TLabel', background=bg_primary, foreground=accent_color,
+                       font=('Arial', 9, 'bold'))
+        style.configure('Error.TLabel', background=bg_primary, foreground=error_color,
+                       font=('Arial', 9, 'bold'))
+        style.configure('Warning.TLabel', background=bg_primary, foreground=warning_color,
+                       font=('Arial', 9, 'bold'))
+        style.configure('Status.TLabel', background=bg_secondary, foreground=fg_secondary,
+                       font=('Courier', 8))
 
         # Frame principale
         main_frame = ttk.Frame(self.root)
@@ -97,36 +133,74 @@ class DJInterface:
         setup_frame = ttk.LabelFrame(parent, text="🔧 Setup Sistema", padding=10)
         setup_frame.pack(fill=tk.X, pady=(0, 10))
 
-        # Status sistema
+        # Status sistema con indicatori real-time
         status_frame = ttk.Frame(setup_frame)
         status_frame.pack(fill=tk.X, pady=(0, 10))
 
-        self.status_label = ttk.Label(status_frame, text="📊 Controllo sistema...")
-        self.status_label.pack(anchor=tk.W)
+        # Status indicators grid
+        status_grid = ttk.Frame(status_frame)
+        status_grid.pack(fill=tk.X)
+
+        # System status indicators
+        self.system_status_var = tk.StringVar(value="🔄 Checking...")
+        self.system_status_label = ttk.Label(status_grid, textvariable=self.system_status_var,
+                                            style='Status.TLabel')
+        self.system_status_label.grid(row=0, column=0, sticky=tk.W, padx=(0, 20))
+
+        # MIDI status indicator
+        self.midi_connection_var = tk.StringVar(value="🔴 MIDI: Disconnected")
+        self.midi_connection_label = ttk.Label(status_grid, textvariable=self.midi_connection_var,
+                                             style='Error.TLabel')
+        self.midi_connection_label.grid(row=0, column=1, sticky=tk.W, padx=(0, 20))
+
+        # AI status indicator
+        self.ai_connection_var = tk.StringVar(value="🔴 AI: Disconnected")
+        self.ai_connection_label = ttk.Label(status_grid, textvariable=self.ai_connection_var,
+                                           style='Error.TLabel')
+        self.ai_connection_label.grid(row=0, column=2, sticky=tk.W, padx=(0, 20))
+
+        # Music library indicator
+        self.library_status_var = tk.StringVar(value="📁 Library: Unknown")
+        self.library_status_label = ttk.Label(status_grid, textvariable=self.library_status_var,
+                                             style='Status.TLabel')
+        self.library_status_label.grid(row=0, column=3, sticky=tk.W)
 
         # Setup veloce
         setup_row = ttk.Frame(setup_frame)
         setup_row.pack(fill=tk.X)
 
-        # Venue type
+        # Venue type - load from persistent settings
         ttk.Label(setup_row, text="Locale:").grid(row=0, column=0, sticky=tk.W, padx=(0, 5))
-        self.venue_var = tk.StringVar(value="club")
+        self.venue_var = tk.StringVar(value=self.persistent_settings.last_venue_type)
         venue_combo = ttk.Combobox(setup_row, textvariable=self.venue_var,
                                   values=list(VENUE_TYPES.keys()), state="readonly", width=15)
         venue_combo.grid(row=0, column=1, padx=5)
+        venue_combo.bind('<<ComboboxSelected>>', self._on_venue_change)
 
-        # Event type
+        # Event type - load from persistent settings
         ttk.Label(setup_row, text="Evento:").grid(row=0, column=2, sticky=tk.W, padx=(10, 5))
-        self.event_var = tk.StringVar(value="prime_time")
+        self.event_var = tk.StringVar(value=self.persistent_settings.last_event_type)
         event_combo = ttk.Combobox(setup_row, textvariable=self.event_var,
                                   values=list(EVENT_TYPES.keys()), state="readonly", width=15)
         event_combo.grid(row=0, column=3, padx=5)
+        event_combo.bind('<<ComboboxSelected>>', self._on_event_change)
 
         # API Key
         ttk.Label(setup_row, text="API Key:").grid(row=0, column=4, sticky=tk.W, padx=(10, 5))
-        self.api_key_var = tk.StringVar(value=self.config.openrouter_api_key or "")
-        api_entry = ttk.Entry(setup_row, textvariable=self.api_key_var, show="*", width=20)
+        # Auto-load API key from persistent settings or environment
+        api_key_value = (self.persistent_settings.openrouter_api_key or
+                        self.config.openrouter_api_key or "")
+        if api_key_value:
+            # Mask the key for display but keep full value
+            display_value = f"***{api_key_value[-8:]}" if len(api_key_value) > 8 else "***"
+        else:
+            display_value = ""
+        self.api_key_var = tk.StringVar(value=api_key_value)
+        self.api_key_display_var = tk.StringVar(value=display_value)
+        api_entry = ttk.Entry(setup_row, textvariable=self.api_key_display_var, show="*", width=20)
         api_entry.grid(row=0, column=5, padx=5)
+        api_entry.bind('<FocusIn>', self._on_api_key_focus_in)
+        api_entry.bind('<FocusOut>', self._on_api_key_focus_out)
 
         # Bottone avvio
         self.start_button = ttk.Button(setup_row, text="🚀 AVVIA DJ AI", command=self._start_dj_system)
@@ -151,9 +225,9 @@ class DJInterface:
         right_frame = ttk.Frame(controls_frame)
         right_frame.pack(side=tk.RIGHT, fill=tk.Y, padx=(10, 0))
 
-        # Energy slider
+        # Energy slider - load from persistent settings
         ttk.Label(right_frame, text="Energia (1-10):").pack(anchor=tk.W)
-        self.energy_var = tk.IntVar(value=5)
+        self.energy_var = tk.IntVar(value=self.persistent_settings.default_energy_level)
         self.energy_slider = ttk.Scale(right_frame, from_=1, to=10, orient=tk.HORIZONTAL,
                                       variable=self.energy_var, command=self._on_energy_change)
         self.energy_slider.pack(fill=tk.X, pady=5)
@@ -276,22 +350,79 @@ class DJInterface:
         self.root.bind('<Control-q>', lambda e: self._quit_application())
         self.root.protocol("WM_DELETE_WINDOW", self._quit_application)
 
+    def _on_api_key_focus_in(self, event):
+        """Handle API key field focus in - show actual key for editing"""
+        self.api_key_display_var.set(self.api_key_var.get())
+
+    def _on_api_key_focus_out(self, event):
+        """Handle API key field focus out - update actual key and mask display"""
+        # Update the actual API key value
+        new_value = self.api_key_display_var.get()
+        self.api_key_var.set(new_value)
+
+        # Save to persistent settings if changed
+        if hasattr(self.persistent_settings, 'openrouter_api_key'):
+            old_value = self.persistent_settings.openrouter_api_key
+            if new_value != old_value:
+                self.persistent_settings.openrouter_api_key = new_value
+                self.persistent_settings.save_to_file()
+                print(f"✅ API key saved to persistent settings")
+
+        # Mask the display value
+        if new_value:
+            display_value = f"***{new_value[-8:]}" if len(new_value) > 8 else "***"
+            self.api_key_display_var.set(display_value)
+
+    def _on_venue_change(self, event):
+        """Handle venue type change - save to persistent settings"""
+        new_venue = self.venue_var.get()
+        if hasattr(self.persistent_settings, 'last_venue_type'):
+            self.persistent_settings.last_venue_type = new_venue
+            self.persistent_settings.save_to_file()
+
+    def _on_event_change(self, event):
+        """Handle event type change - save to persistent settings"""
+        new_event = self.event_var.get()
+        if hasattr(self.persistent_settings, 'last_event_type'):
+            self.persistent_settings.last_event_type = new_event
+            self.persistent_settings.save_to_file()
+
     def _check_system(self):
-        """Controlla stato sistema"""
+        """Controlla stato sistema con indicatori real-time"""
         requirements = check_system_requirements()
 
-        status_text = "📊 Sistema:\n"
-        for key, value in requirements.items():
-            if key != "errors":
-                icon = "✅" if value else "❌"
-                status_text += f"{icon} {key}: {value}\n"
+        # Update system status
+        if requirements.get("python_version") and requirements.get("music_library"):
+            self.system_status_var.set("✅ System: Ready")
+            self.system_status_label.config(style='Success.TLabel')
+        else:
+            self.system_status_var.set("❌ System: Issues")
+            self.system_status_label.config(style='Error.TLabel')
 
-        if requirements["errors"]:
-            status_text += "\n❌ Errori:\n"
-            for error in requirements["errors"]:
-                status_text += f"  • {error}\n"
+        # Update MIDI status
+        if requirements.get("midi_system"):
+            self.midi_connection_var.set("🟡 MIDI: Available")
+            self.midi_connection_label.config(style='Warning.TLabel')
+        else:
+            self.midi_connection_var.set("❌ MIDI: Unavailable")
+            self.midi_connection_label.config(style='Error.TLabel')
 
-        self.status_label.config(text=status_text.replace('\n', ' | '))
+        # Update AI status based on API key
+        if requirements.get("api_key"):
+            self.ai_connection_var.set("🟡 AI: Key Ready")
+            self.ai_connection_label.config(style='Warning.TLabel')
+        else:
+            self.ai_connection_var.set("❌ AI: No Key")
+            self.ai_connection_label.config(style='Error.TLabel')
+
+        # Update library status
+        music_count = requirements.get("music_files_count", 0)
+        if music_count > 0:
+            self.library_status_var.set(f"✅ Library: {music_count} tracks")
+            self.library_status_label.config(style='Success.TLabel')
+        else:
+            self.library_status_var.set("❌ Library: No tracks")
+            self.library_status_label.config(style='Error.TLabel')
 
         # Abilita avvio se requisiti OK
         all_ok = all(requirements[k] for k in ["python_version", "music_library", "api_key"])
@@ -371,6 +502,10 @@ class DJInterface:
         self.root.after(0, lambda: self.model_status_var.set(f"🤖 Modello: {model_name}"))
         self.root.after(0, lambda: self.connection_status_var.set("🟢 Connesso"))
         self.root.after(0, lambda: self.perf_status_var.set(f"⏱️ Latenza: {response.processing_time_ms:.0f}ms"))
+
+        # Update real-time AI indicator
+        self.root.after(0, lambda: self.ai_connection_var.set("✅ AI: Connected"))
+        self.root.after(0, lambda: self.ai_connection_label.config(style='Success.TLabel'))
 
     def _scan_music_library(self):
         """Scansione libreria musicale"""
@@ -476,6 +611,11 @@ AI Attivo: {'✅' if self.ai_enabled else '❌'}
         energy = int(float(value))
         self.dj_context.energy_level = energy
 
+        # Save to persistent settings
+        if hasattr(self.persistent_settings, 'default_energy_level'):
+            self.persistent_settings.default_energy_level = energy
+            self.persistent_settings.save_to_file()
+
         # Informa AI del cambio
         if self.ai_enabled and self.ai_client:
             threading.Thread(
@@ -543,6 +683,10 @@ AI Attivo: {'✅' if self.ai_enabled else '❌'}
                 # Test completato
                 self.root.after(0, lambda: self.midi_status_var.set("✅ MIDI: Test completato! Traktor dovrebbe lampeggiare"))
                 self.root.after(0, lambda: self._log_status("✅ Test MIDI completato - verifica che l'icona MIDI di Traktor lampeggi"))
+
+                # Update real-time MIDI indicator
+                self.root.after(0, lambda: self.midi_connection_var.set("✅ MIDI: Connected"))
+                self.root.after(0, lambda: self.midi_connection_label.config(style='Success.TLabel'))
 
             except Exception as e:
                 self.root.after(0, lambda: self.midi_status_var.set("❌ MIDI: Errore test"))
@@ -652,6 +796,19 @@ AI Attivo: {'✅' if self.ai_enabled else '❌'}
         """Chiudi applicazione"""
         self.running = False
         self.session_active = False
+
+        # Save window size before closing
+        try:
+            geometry = self.root.geometry()
+            if 'x' in geometry:
+                size_part = geometry.split('+')[0]  # Get just the WIDTHxHEIGHT part
+                width, height = map(int, size_part.split('x'))
+                if hasattr(self.persistent_settings, 'window_width'):
+                    self.persistent_settings.window_width = width
+                    self.persistent_settings.window_height = height
+                    self.persistent_settings.save_to_file()
+        except Exception as e:
+            print(f"⚠️  Error saving window size: {e}")
 
         if self.traktor_controller:
             self.traktor_controller.disconnect()

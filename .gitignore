@@ -60,3 +60,8 @@ temp/
 
 # Claude specific
 .claude/
+
+# API Keys e configurazione sensibile (SICUREZZA)
+.env
+*.key
+config_private.py

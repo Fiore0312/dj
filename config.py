@@ -56,8 +56,11 @@ class DJConfig:
         """Carica configurazione da variabili ambiente"""
         config = cls()
 
-        # API Key da ambiente o default
-        config.openrouter_api_key = os.getenv('OPENROUTER_API_KEY') or "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"
+        # API Key priority: environment > persistent settings > None
+        config.openrouter_api_key = os.getenv('OPENROUTER_API_KEY')
+
+        # Note: Persistent settings loading moved to avoid circular imports
+        # API key will be loaded separately by the system when needed
 
         # Override da env se disponibili
         if os.getenv('MUSIC_PATH'):
@@ -168,6 +171,19 @@ def get_config() -> DJConfig:
     """Ottieni configurazione del sistema"""
     return DJConfig.load_from_env()
 
+def load_api_key_from_persistent_settings() -> Optional[str]:
+    """Carica API key dai settings persistenti, evitando import circolari"""
+    try:
+        # Import locale per evitare circular imports
+        from core.persistent_config import get_persistent_settings
+        persistent = get_persistent_settings()
+        if hasattr(persistent, 'openrouter_api_key') and persistent.openrouter_api_key:
+            return persistent.openrouter_api_key
+    except Exception as e:
+        # Fallback gracefully if persistent config fails
+        print(f"⚠️  Could not load API key from persistent settings: {e}")
+    return None
+
 def check_system_requirements() -> Dict[str, Any]:
     """Controlla requisiti sistema"""
     status = {
@@ -200,11 +216,17 @@ def check_system_requirements() -> Dict[str, Any]:
     else:
         status["errors"].append(f"Cartella musica non trovata: {config.music_library_path}")
 
-    # Controlla API key
-    if config.openrouter_api_key:
+    # Controlla API key - priority: config > persistent settings
+    api_key = config.openrouter_api_key
+    if not api_key:
+        api_key = load_api_key_from_persistent_settings()
+
+    if api_key:
         status["api_key"] = True
+        # Update config with loaded API key for immediate use
+        config.openrouter_api_key = api_key
     else:
-        status["errors"].append("OpenRouter API key mancante")
+        status["errors"].append("OpenRouter API key mancante - aggiungila in ~/.config/dj_ai/user_settings.json o via OPENROUTER_API_KEY env var")
 
     # Controlla MIDI (basic check)
     try:

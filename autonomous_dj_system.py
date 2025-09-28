@@ -18,11 +18,29 @@ from pathlib import Path
 # Core configuration
 from config import DJConfig, VENUE_TYPES, EVENT_TYPES, get_config
 
-# Autonomous components
-from autonomous_audio_engine import RealTimeAnalyzer, AudioFeatures
-from autonomous_decision_engine import AutonomousDecisionEngine, MixContext, DecisionUrgency, DJDecision
-from autonomous_mixing_controller import AutonomousMixingController, MixParameters, MixTransitionType
-from dj_memory_system import DJMemorySystem, MemoryType
+# Autonomous components (optional)
+try:
+    from autonomous_audio_engine import RealTimeAnalyzer, AudioFeatures
+    from autonomous_decision_engine import AutonomousDecisionEngine, MixContext, DecisionUrgency, DJDecision
+    from autonomous_mixing_controller import AutonomousMixingController, MixParameters, MixTransitionType
+    from dj_memory_system import DJMemorySystem, MemoryType
+    AUTONOMOUS_AVAILABLE = True
+except ImportError as e:
+    print(f"⚠️ Autonomous components not available: {e}")
+    print("💡 Run: pip install librosa essentia-tensorflow scikit-learn sounddevice")
+    AUTONOMOUS_AVAILABLE = False
+    # Fallback types
+    AudioFeatures = None
+    RealTimeAnalyzer = None
+    AutonomousDecisionEngine = None
+    MixContext = None
+    DecisionUrgency = None
+    DJDecision = None
+    AutonomousMixingController = None
+    MixParameters = None
+    MixTransitionType = None
+    DJMemorySystem = None
+    MemoryType = None
 
 # Music and control
 from music_library import MusicLibraryScanner, TrackInfo, get_music_scanner

@@ -27,13 +27,8 @@ except ImportError:
     OPENROUTER_AVAILABLE = False
     print("⚠️ OpenRouter client not available")
 
-# Audio analysis
-try:
-    from autonomous_audio_engine import AudioFeatures, RealTimeAnalyzer
-    AUDIO_ENGINE_AVAILABLE = True
-except ImportError:
-    AUDIO_ENGINE_AVAILABLE = False
-    print("⚠️ Audio engine not available")
+# Audio analysis via dependency manager
+from core.dependency_manager import get_dependency_manager, is_audio_analysis_available
 
 logger = logging.getLogger(__name__)
 
@@ -139,7 +134,8 @@ class AutonomousDecisionEngine:
 
         # Core components
         self.music_scanner = get_music_scanner(self.config)
-        self.audio_analyzer = RealTimeAnalyzer() if AUDIO_ENGINE_AVAILABLE else None
+        analyzer_class = get_dependency_manager().get_real_time_analyzer_class()
+        self.audio_analyzer = analyzer_class() if analyzer_class else None
 
         # AI client
         self.ai_client = None

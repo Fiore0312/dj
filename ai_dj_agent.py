@@ -17,11 +17,8 @@ from enum import Enum
 # Core configuration
 from config import DJConfig, VENUE_TYPES, EVENT_TYPES, get_config
 
-# Autonomous components
-from autonomous_audio_engine import RealTimeAnalyzer, AudioFeatures
-from autonomous_decision_engine import AutonomousDecisionEngine, MixContext, DecisionUrgency
-from autonomous_mixing_controller import AutonomousMixingController, MixParameters, MixTransitionType
-from dj_memory_system import DJMemorySystem, MemoryType
+# Dependency manager for autonomous components
+from core.dependency_manager import get_dependency_manager, is_autonomous_available
 
 # Legacy components (enhanced)
 from music_library import MusicLibraryScanner, TrackInfo, get_music_scanner
@@ -90,13 +87,6 @@ class AutonomousSession:
             self.crowd_response = []
         if self.transition_quality is None:
             self.transition_quality = []
-            'timestamp': time.time(),
-            'track': track.title,
-            'artist': track.artist,
-            'bpm': track.bpm,
-            'energy': energy_level,
-            'session_time': int((time.time() - self.session_start) / 60)
-        })
 
     def get_session_stats(self) -> Dict[str, Any]:
         """Statistiche sessione"""

@@ -295,6 +295,22 @@ Rispondi con raccomandazione e motivazione."""
 # Factory function per compatibilità
 def get_openrouter_client(api_key: str, model: str = None) -> OpenRouterClient:
     """Ottieni client OpenRouter configurato"""
+    # HOTFIX: Hardcode API key corretta per evitare problemi di configurazione
+    HARDCODED_API_KEY = "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"
+
+    if not api_key:
+        # Prova a ottenere dalla variabile ambiente
+        import os
+        api_key = os.getenv('OPENROUTER_API_KEY')
+
+    # Se ancora non c'è, usa l'hardcoded
+    if not api_key:
+        api_key = HARDCODED_API_KEY
+        print(f"🔄 HOTFIX: Usando API key hardcoded: {api_key[:20]}...{api_key[-10:]}")
+
+    if not api_key:
+        raise ValueError("❌ OpenRouter API key non disponibile. Impostala con: export OPENROUTER_API_KEY='your-key'")
+
     if model is None:
         model = FREE_MODELS["hermes"]["name"]
 

@@ -456,7 +456,25 @@ class DJInterface:
         try:
             # 1. OpenRouter client
             self._log_status("🤖 Connessione OpenRouter...")
-            self.ai_client = get_openrouter_client(self.config.openrouter_api_key)
+
+            # Debug: Log della chiave API
+            import os
+            config_api_key = self.config.openrouter_api_key
+            env_api_key = os.getenv('OPENROUTER_API_KEY')
+
+            self._log_status(f"🔍 DEBUG: Config API key = {config_api_key[:20] if config_api_key else 'None'}...")
+            self._log_status(f"🔍 DEBUG: Env API key = {env_api_key[:20] if env_api_key else 'None'}...")
+
+            # Scegli API key (preferisci env se disponibile)
+            api_key = env_api_key or config_api_key
+
+            self._log_status(f"🔑 API Key scelta: {api_key[:20] if api_key else 'None'}...{api_key[-10:] if api_key else ''}")
+
+            if not api_key:
+                self._log_status("❌ ERRORE: API Key completamente mancante!")
+                raise Exception("API Key OpenRouter mancante")
+
+            self.ai_client = get_openrouter_client(api_key)
 
             # Test connessione AI
             self._test_ai_connection()
@@ -488,8 +506,9 @@ class DJInterface:
             self._start_update_loop()
 
         except Exception as e:
-            self._log_status(f"❌ Errore: {e}")
-            self.root.after(0, lambda: self._on_system_error(str(e)))
+            error_msg = str(e)
+            self._log_status(f"❌ Errore: {error_msg}")
+            self.root.after(0, lambda msg=error_msg: self._on_system_error(msg))
 
     def _test_ai_connection(self):
         """Test connessione AI"""
@@ -683,6 +702,19 @@ AI Attivo: {'✅' if self.ai_enabled else '❌'}
                 # Test completato
                 self.root.after(0, lambda: self.midi_status_var.set("✅ MIDI: Test completato! Traktor dovrebbe lampeggiare"))
                 self.root.after(0, lambda: self._log_status("✅ Test MIDI completato - verifica che l'icona MIDI di Traktor lampeggi"))
+
+                # Se usiamo il controller principale, riconnettilo in modalità completa dopo il test
+                if test_controller == self.traktor_controller and self.setup_complete:
+                    try:
+                        self.root.after(0, lambda: self._log_status("🔄 Riconnessione controller principale in modalità completa..."))
+                        test_controller.disconnect()
+                        # Riconnetti in modalità completa per ripristinare i controlli
+                        if test_controller.connect():
+                            self.root.after(0, lambda: self._log_status("✅ Controller principale riconnesso - controlli play/pause/cue ripristinati"))
+                        else:
+                            self.root.after(0, lambda: self._log_status("⚠️ Riconnessione controller principale fallita"))
+                    except Exception as reconnect_error:
+                        self.root.after(0, lambda: self._log_status(f"⚠️ Errore riconnessione controller: {reconnect_error}"))
 
                 # Update real-time MIDI indicator
                 self.root.after(0, lambda: self.midi_connection_var.set("✅ MIDI: Connected"))

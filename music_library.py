@@ -26,13 +26,8 @@ except ImportError:
 
 from config import DJConfig
 
-# Import audio engine for advanced analysis
-try:
-    from autonomous_audio_engine import RealTimeAnalyzer, AudioFeatures
-    AUDIO_ENGINE_AVAILABLE = True
-except ImportError:
-    AUDIO_ENGINE_AVAILABLE = False
-    print("⚠️ Autonomous audio engine not available. Advanced analysis disabled.")
+# Import dependency manager for advanced analysis
+from core.dependency_manager import get_dependency_manager, is_audio_analysis_available
 
 logger = logging.getLogger(__name__)
 
@@ -67,7 +62,7 @@ class TrackInfo:
     compatible_bpm_range: Optional[Tuple[float, float]] = None
 
     # Advanced audio analysis (from autonomous engine)
-    audio_features: Optional[AudioFeatures] = None
+    audio_features: Optional[Any] = None  # AudioFeatures when available
     harmonic_key: Optional[str] = None
     structural_segments: Optional[List[float]] = None
     optimal_mix_points: Optional[List[float]] = None
@@ -129,9 +124,11 @@ class MusicLibraryScanner:
 
         # Audio engine per analisi avanzata
         self.audio_analyzer = None
-        if AUDIO_ENGINE_AVAILABLE:
-            self.audio_analyzer = RealTimeAnalyzer()
-            print("🎵 Advanced audio analysis enabled")
+        if is_audio_analysis_available():
+            analyzer_class = get_dependency_manager().get_real_time_analyzer_class()
+            if analyzer_class:
+                self.audio_analyzer = analyzer_class()
+                print("🎵 Advanced audio analysis enabled")
 
         self._init_database()
 
@@ -193,7 +190,7 @@ class MusicLibraryScanner:
         except:
             return ""
 
-    def _enhance_track_with_audio_features(self, track: TrackInfo, audio_features: AudioFeatures):
+    def _enhance_track_with_audio_features(self, track: TrackInfo, audio_features: Any):
         """Enhance track with advanced audio analysis features"""
         try:
             # Store the complete audio features object (for future use)
@@ -392,7 +389,7 @@ class MusicLibraryScanner:
                 track = self._extract_metadata(filepath)
 
                 # Analisi audio avanzata (se disponibile)
-                if self.audio_analyzer and AUDIO_ENGINE_AVAILABLE:
+                if self.audio_analyzer and is_audio_analysis_available():
                     try:
                         audio_features = self.audio_analyzer.analyze_track_structure(str(filepath))
                         if audio_features:

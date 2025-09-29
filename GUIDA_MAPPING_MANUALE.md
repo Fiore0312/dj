@@ -100,6 +100,20 @@ EQ Deck A Low           CH1 CC14       Deck A → EQ Low
 EQ Deck B High          CH1 CC15       Deck B → EQ High
 EQ Deck B Mid           CH1 CC16       Deck B → EQ Mid
 EQ Deck B Low           CH1 CC17       Deck B → EQ Low
+
+🎵 COMANDI CARICAMENTO TRACCE (Nuovi - Auto-Mix)
+─────────────────────────────────────────────────────────────
+Load Track Deck A       CH1 CC32       Deck A → Load Selected
+Load Track Deck B       CH1 CC33       Deck B → Load Selected
+Load Track Deck C       CH1 CC34       Deck C → Load Selected
+Load Track Deck D       CH1 CC35       Deck D → Load Selected
+
+🔍 CONTROLLI BROWSER (Nuovi - Auto-Mix)
+─────────────────────────────────────────────────────────────
+Browser Scroll Up       CH1 CC36       Browser → Move up
+Browser Scroll Down     CH1 CC37       Browser → Move down
+Browser Select Item     CH1 CC38       Browser → Select
+Browser Back            CH1 CC39       Browser → Back/Up level
 ```
 
 ### 🎯 **TIPI DI CONTROLLO**
@@ -126,13 +140,64 @@ EQ Deck B Low           CH1 CC17       Deck B → EQ Low
 - Per Play/Pause usa "Toggle" mode
 - Per Cue usa "Hold" mode
 
-### ✅ **CONFIGURAZIONE MINIMA FUNZIONANTE**
+### 🤖 **PASSO 4: Mappings Auto-Mix (Opzionale - Per Agente Autonomo)**
 
+Per abilitare le funzionalità Auto-Mix complete, aggiungi questi mappings per il caricamento automatico delle tracce:
+
+#### **H. Load Track Deck A**
+1. Clicca "Add In..."
+2. **MIDI Channel**: `1`, **CC**: `32`
+3. **Assignment**: `Deck A → Load Selected`
+4. **Type**: `Button`
+5. **Interaction Mode**: `Trigger`
+
+#### **I. Load Track Deck B**
+1. Clicca "Add In..."
+2. **MIDI Channel**: `1`, **CC**: `33`
+3. **Assignment**: `Deck B → Load Selected`
+4. **Type**: `Button`
+5. **Interaction Mode**: `Trigger`
+
+#### **J. Browser Navigation**
+Per navigazione browser automatica:
+
+1. **Browser Up** (CC36): `Browser → Move Up`
+2. **Browser Down** (CC37): `Browser → Move Down`
+3. **Browser Select** (CC38): `Browser → Select`
+4. **Browser Back** (CC39): `Browser → Back/Up Level`
+
+### ✅ **CONFIGURAZIONI DISPONIBILI**
+
+#### **🎯 CONFIGURAZIONE MINIMA (7 controlli)**
 Con questi 7 mappings puoi già fare un DJ set completo:
 1. ✅ Volume Deck A/B
 2. ✅ Play Deck A/B
 3. ✅ Crossfader
 4. ✅ Cue Deck A/B
 
-**Tempo stimato configurazione**: 5-10 minuti
-**Risultato**: Sistema DJ AI completamente funzionale! 🎉
+**Tempo stimato**: 5-10 minuti
+**Risultato**: DJ mixing manuale completo
+
+#### **🤖 CONFIGURAZIONE AUTO-MIX (15 controlli)**
+Aggiungi i mappings Auto-Mix per l'agente autonomo:
+1. ✅ Tutti i controlli minimi (7)
+2. ✅ Load Track Deck A/B (2)
+3. ✅ Browser Navigation (4)
+4. ✅ EQ Controls (6)
+
+**Tempo stimato**: 15-20 minuti
+**Risultato**: Sistema DJ AI completamente autonomo! 🎉
+
+### 🚀 **UTILIZZO AUTO-MIX**
+
+Una volta configurati i mappings Auto-Mix:
+
+1. **Avvia DJ AI System**: `python3 dj_ai.py`
+2. **Avvia il sistema**: Click "🚀 AVVIA DJ AI"
+3. **Attiva Auto-Mix**: Click "🎵 Auto-Mix: OFF"
+4. **Imposta intervallo**: Scegli 60-300 secondi
+5. **L'AI ora prende controllo autonomo**:
+   - 🎵 Carica nuove tracce automaticamente
+   - 🎛️ Regola crossfader e volumi
+   - 🎚️ Ottimizza EQ per energia del set
+   - 📊 Adatta decisioni al timing del set

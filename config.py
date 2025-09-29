@@ -15,8 +15,8 @@ class DJConfig:
 
     # OpenRouter API
     openrouter_api_key: Optional[str] = None
-    openrouter_model: str = "deepseek/deepseek-r1:free"  # Modello primario gratuito 2025
-    openrouter_fallback_model: str = "nousresearch/hermes-3-llama-3.1-405b"  # Backup creatività musicale
+    openrouter_model: str = "meta-llama/llama-3.3-8b-instruct:free"  # 2s response - PERFETTO per DJ
+    openrouter_fallback_model: str = "x-ai/grok-4-fast:free"  # Backup veloce gratuito
 
     # Musica
     music_library_path: str = "/Users/Fiore/Music"
@@ -116,23 +116,23 @@ OPENROUTER_HEADERS = {
 
 # Modelli gratuiti raccomandati 2025
 FREE_MODELS = {
-    "deepseek_r1": {
-        "name": "deepseek/deepseek-r1:free",
-        "description": "Primary 2025 - Reasoning avanzato, performance eccellenti",
+    "llama_fast": {
+        "name": "meta-llama/llama-3.3-8b-instruct:free",
+        "description": "Primary 2025 - VELOCE (2.5s), completamente gratuito, ideale per DJ",
         "context_length": 128000,
-        "good_for": ["reasoning", "analysis", "real_time", "primary"]
+        "good_for": ["speed", "interactive", "dj", "primary"]
     },
-    "hermes": {
-        "name": "nousresearch/hermes-3-llama-3.1-405b",
-        "description": "Fallback - Eccellente per creatività musicale e decisioni DJ",
-        "context_length": 128000,
-        "good_for": ["creative", "music", "fallback"]
+    "grok_fast": {
+        "name": "x-ai/grok-4-fast:free",
+        "description": "Fallback veloce - Buona qualità, gratuito",
+        "context_length": 2000000,
+        "good_for": ["fallback", "creative", "long_context"]
     },
-    "deepseek_v3": {
-        "name": "deepseek/deepseek-v3-base:free",
-        "description": "Ultra-veloce per operazioni urgenti",
+    "hunyuan": {
+        "name": "tencent/hunyuan-a13b-instruct:free",
+        "description": "Backup - Stabile e gratuito",
         "context_length": 32768,
-        "good_for": ["speed", "urgent", "lightweight"]
+        "good_for": ["backup", "stable", "instruct"]
     },
 }
 

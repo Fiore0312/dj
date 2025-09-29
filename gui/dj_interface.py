@@ -267,6 +267,22 @@ class DJInterface:
                                        command=self._toggle_ai)
         self.ai_toggle_btn.pack(fill=tk.X, pady=5)
 
+        # Auto-Mix Toggle
+        self.auto_mix_active = False
+        self.auto_mix_timer = None
+        self.auto_mix_btn = ttk.Button(right_frame, text="🎵 Auto-Mix: OFF",
+                                     command=self._toggle_auto_mix)
+        self.auto_mix_btn.pack(fill=tk.X, pady=5)
+
+        # Auto-Mix Interval Selector
+        interval_frame = ttk.Frame(right_frame)
+        interval_frame.pack(fill=tk.X, pady=2)
+        ttk.Label(interval_frame, text="Intervallo:").pack(side=tk.LEFT)
+        self.auto_mix_interval_var = tk.IntVar(value=180)  # 3 minuti default
+        interval_combo = ttk.Combobox(interval_frame, textvariable=self.auto_mix_interval_var,
+                                    values=[60, 120, 180, 240, 300], width=8, state="readonly")
+        interval_combo.pack(side=tk.RIGHT)
+
         # MIDI Test Button
         self.midi_test_btn = ttk.Button(right_frame, text="🎛️ Test MIDI",
                                        command=self._test_midi_connection)
@@ -292,8 +308,13 @@ class DJInterface:
         input_frame = ttk.Frame(chat_frame)
         input_frame.pack(fill=tk.X)
 
-        self.chat_entry = ttk.Entry(input_frame, font=('Arial', 10))
+        self.chat_entry = ttk.Entry(input_frame, font=('Arial', 11), width=50)
         self.chat_entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(0, 10))
+
+        # Placeholder text
+        self.chat_entry.insert(0, "Scrivi qui per comunicare con l'AI DJ...")
+        self.chat_entry.bind('<FocusIn>', self._on_chat_focus_in)
+        self.chat_entry.bind('<FocusOut>', self._on_chat_focus_out)
 
         ttk.Button(input_frame, text="Invia", command=self._send_chat).pack(side=tk.RIGHT)
 
@@ -372,6 +393,16 @@ class DJInterface:
         if new_value:
             display_value = f"***{new_value[-8:]}" if len(new_value) > 8 else "***"
             self.api_key_display_var.set(display_value)
+
+    def _on_chat_focus_in(self, event):
+        """Quando il campo chat riceve il focus"""
+        if self.chat_entry.get() == "Scrivi qui per comunicare con l'AI DJ...":
+            self.chat_entry.delete(0, tk.END)
+
+    def _on_chat_focus_out(self, event):
+        """Quando il campo chat perde il focus"""
+        if not self.chat_entry.get():
+            self.chat_entry.insert(0, "Scrivi qui per comunicare con l'AI DJ...")
 
     def _on_venue_change(self, event):
         """Handle venue type change - save to persistent settings"""
@@ -536,6 +567,13 @@ class DJInterface:
         """Sistema pronto"""
         self.start_button.config(text="✅ Sistema Attivo", state=tk.DISABLED)
         self.ai_toggle_btn.config(text="🤖 AI: OFF", state=tk.NORMAL)
+
+        # Inizializza timing sessione per Auto-Mix
+        self.session_start_time = time.time()
+
+        # Imposta focus sul campo chat
+        self.chat_entry.focus_set()
+
         self._add_chat_message("Sistema", "🎧 DJ AI System pronto! Dimmi come vuoi procedere con il set.")
 
     def _on_system_error(self, error: str):
@@ -755,14 +793,181 @@ AI Attivo: {'✅' if self.ai_enabled else '❌'}
         self._log_status("🚨 EMERGENCY STOP attivato!")
         self._add_chat_message("Sistema", "🚨 EMERGENCY STOP! Tutti i volumi azzerati per sicurezza.")
 
+    def _toggle_auto_mix(self):
+        """Toggle modalità Auto-Mix autonoma"""
+        self.auto_mix_active = not self.auto_mix_active
+
+        if self.auto_mix_active:
+            # Avvia auto-mix
+            if not self.ai_client:
+                self._add_chat_message("Sistema", "❌ Auto-Mix richiede connessione AI attiva")
+                self.auto_mix_active = False
+                return
+
+            interval = self.auto_mix_interval_var.get() * 1000  # Convert to milliseconds
+            self.auto_mix_btn.config(text="🎵 Auto-Mix: ON")
+            self._log_status(f"🤖 Auto-Mix attivato (intervallo: {interval//1000}s)")
+            self._add_chat_message("Sistema", f"🤖 Auto-Mix attivato! L'AI prenderà decisioni ogni {interval//1000} secondi.")
+
+            # Avvia timer per decisioni autonome
+            self._schedule_auto_mix_decision()
+        else:
+            # Disattiva auto-mix
+            if self.auto_mix_timer:
+                self.root.after_cancel(self.auto_mix_timer)
+                self.auto_mix_timer = None
+            self.auto_mix_btn.config(text="🎵 Auto-Mix: OFF")
+            self._log_status("🤖 Auto-Mix disattivato")
+            self._add_chat_message("Sistema", "🤖 Auto-Mix disattivato.")
+
+    def _schedule_auto_mix_decision(self):
+        """Programma prossima decisione autonoma"""
+        if not self.auto_mix_active:
+            return
+
+        interval = self.auto_mix_interval_var.get() * 1000  # Convert to milliseconds
+        self.auto_mix_timer = self.root.after(interval, self._make_autonomous_decision)
+
+    def _make_autonomous_decision(self):
+        """Prendi decisione autonoma basata su contesto attuale"""
+        if not self.auto_mix_active or not self.ai_client:
+            return
+
+        try:
+            # Construisci query contestuale per l'AI
+            time_in_set = int((time.time() - self.session_start_time) / 60) if hasattr(self, 'session_start_time') else 0
+
+            # Aggiorna contesto DJ con info attuali
+            self.dj_context.time_in_set = time_in_set
+            self.dj_context.energy_level = self.energy_var.get()
+
+            # Query intelligente basata sul momento del set
+            if time_in_set < 30:  # Primo 30 minuti - warm up
+                query = "Siamo all'inizio del set. Come dovrei procedere per scaldare il crowd gradualmente?"
+            elif time_in_set < 90:  # 30-90 min - buildup
+                query = "Il set sta prendendo forma. Qual è la strategia migliore per aumentare l'energia?"
+            elif time_in_set < 150:  # 90-150 min - peak time
+                query = "Siamo nel momento di punta del set. Come mantengo l'energia al massimo?"
+            else:  # Oltre 150 min - closing
+                query = "Il set si sta avvicinando alla conclusione. Come gestisco il finale?"
+
+            # Aggiungi info su energia attuale
+            query += f" Energia attuale: {self.dj_context.energy_level}/10."
+
+            # Richiedi decisione urgente
+            threading.Thread(
+                target=lambda: self._process_autonomous_decision(query),
+                daemon=True
+            ).start()
+
+        except Exception as e:
+            self._log_status(f"❌ Errore decisione autonoma: {e}")
+
+        # Programma prossima decisione
+        self._schedule_auto_mix_decision()
+
+    def _process_autonomous_decision(self, query: str):
+        """Processa decisione autonoma dell'AI"""
+        try:
+            response = self.ai_client.get_dj_decision(self.dj_context, query, urgent=True, autonomous_mode=True)
+
+            if response.success:
+                self.stats['ai_decisions'] += 1
+
+                # Mostra decisione in chat
+                self.root.after(0, lambda: self._add_chat_message("Auto-Mix AI", f"🤖 {response.response}"))
+
+                # Aggiorna statistiche
+                self.root.after(0, lambda: self.perf_status_var.set(f"⏱️ Auto-Mix: {response.processing_time_ms:.0f}ms"))
+
+                # Esegui eventuali azioni automatiche
+                if response.decision:
+                    self.root.after(0, lambda: self._execute_autonomous_action(response.decision))
+
+            else:
+                self.root.after(0, lambda: self._add_chat_message("Sistema", f"❌ Errore Auto-Mix: {response.error}"))
+
+        except Exception as e:
+            self.root.after(0, lambda: self._add_chat_message("Sistema", f"❌ Errore Auto-Mix: {e}"))
+
+    def _execute_autonomous_action(self, decision: Dict[str, Any]):
+        """Esegui azioni autonome basate su decisioni AI"""
+        try:
+            # Aggiornamenti di energia
+            if "energy_change" in decision:
+                new_energy = self.dj_context.energy_level + int(decision["energy_change"])
+                new_energy = max(1, min(10, new_energy))
+                self.energy_var.set(new_energy)
+                self.dj_context.energy_level = new_energy
+                self._log_status(f"🎵 Auto-Mix: Energia aggiornata a {new_energy}/10")
+
+            # Cambiamenti BPM suggeriti
+            if "target_bpm" in decision and self.traktor_controller:
+                target_bpm = float(decision["target_bpm"])
+                self.dj_context.target_bpm = target_bpm
+                self._log_status(f"🎵 Auto-Mix: BPM target → {target_bpm}")
+
+            # Azioni MIDI automatiche (solo se sicure)
+            if "action" in decision:
+                action = decision["action"].lower()
+                if action in ["fade_in", "fade_out", "eq_adjust"] and self.traktor_controller:
+                    # Implementa azioni MIDI sicure
+                    self._log_status(f"🎵 Auto-Mix: Eseguendo {action}")
+
+            # Caricamento tracce automatico
+            if "load_track" in decision and self.traktor_controller:
+                from traktor_control import DeckID
+                deck_letter = decision["load_track"].upper()
+                if deck_letter in ["A", "B", "C", "D"]:
+                    deck = DeckID(deck_letter)
+                    direction = decision.get("browse_direction", "down")
+
+                    # Carica nuova traccia nel deck specificato
+                    success = self.traktor_controller.load_next_track_smart(deck, direction)
+                    if success:
+                        self._log_status(f"🎵 Auto-Mix: Traccia caricata nel Deck {deck_letter}")
+                        self._add_chat_message("Auto-Mix AI", f"🎵 Nuova traccia caricata nel Deck {deck_letter}")
+                    else:
+                        self._log_status(f"❌ Auto-Mix: Errore caricamento Deck {deck_letter}")
+
+            # Controlli di volume e crossfader automatici
+            if "crossfader_move" in decision and self.traktor_controller:
+                target_position = decision["crossfader_move"]  # 0-127
+                if 0 <= target_position <= 127:
+                    success = self.traktor_controller.set_crossfader(target_position / 127.0)
+                    if success:
+                        self._log_status(f"🎵 Auto-Mix: Crossfader → {target_position}")
+
+            # Controlli EQ automatici
+            if "eq_adjustment" in decision and self.traktor_controller:
+                from traktor_control import DeckID
+                eq_data = decision["eq_adjustment"]
+                deck_letter = eq_data.get("deck", "A").upper()
+                eq_type = eq_data.get("type", "mid")  # high, mid, low
+                value = eq_data.get("value", 0.5)  # 0.0-1.0
+
+                if deck_letter in ["A", "B", "C", "D"]:
+                    deck = DeckID(deck_letter)
+                    success = self.traktor_controller.set_eq(deck, eq_type, value)
+                    if success:
+                        self._log_status(f"🎵 Auto-Mix: Deck {deck_letter} EQ {eq_type} → {value:.2f}")
+
+        except Exception as e:
+            self._log_status(f"❌ Errore esecuzione azione autonoma: {e}")
+
     def _send_chat(self):
         """Invia messaggio chat"""
         message = self.chat_entry.get().strip()
-        if not message or not self.ai_client:
+
+        # Ignora il placeholder text
+        if message == "Scrivi qui per comunicare con l'AI DJ..." or not message or not self.ai_client:
             return
 
         self.chat_entry.delete(0, tk.END)
         self._add_chat_message("Tu", message)
+
+        # Ripristina focus sul campo input
+        self.chat_entry.focus_set()
 
         # Invia ad AI in thread separato
         threading.Thread(
@@ -779,18 +984,30 @@ AI Attivo: {'✅' if self.ai_enabled else '❌'}
     def _process_ai_message(self, message: str):
         """Processa messaggio AI"""
         try:
-            response = self.ai_client.get_dj_decision(self.dj_context, message, urgent=True)
+            # Verifica se Auto-Mix è attivo per modalità autonoma
+            autonomous_mode = hasattr(self, 'auto_mix_active') and self.auto_mix_active
+            response = self.ai_client.get_dj_decision(self.dj_context, message, urgent=True, autonomous_mode=autonomous_mode)
 
             if response.success:
                 self.stats['ai_decisions'] += 1
                 self.root.after(0, lambda: self._add_chat_message("AI", response.response))
+                self.root.after(0, lambda: self.chat_entry.focus_set())  # Ripristina focus
+
+                # Debug: Log decision status
+                decision_status = "HAS DECISION" if response.decision else "NO DECISION"
+                self._log_status(f"🔍 AI Response: {decision_status} | Autonomous: {autonomous_mode}")
+                if response.decision:
+                    self._log_status(f"📋 Decision JSON: {response.decision}")
 
                 # Aggiorna statistiche performance
                 self.root.after(0, lambda: self.perf_status_var.set(f"⏱️ Latenza: {response.processing_time_ms:.0f}ms"))
 
                 # Esegui eventuali azioni
                 if response.decision:
+                    self._log_status(f"🎛️ Executing AI decision...")
                     self.root.after(0, lambda: self._execute_ai_decision(response.decision))
+                elif autonomous_mode:
+                    self._log_status(f"⚠️ Autonomous mode ON but NO decision JSON generated!")
             else:
                 self.root.after(0, lambda: self._add_chat_message("Sistema", f"❌ Errore AI: {response.error}"))
 
@@ -798,20 +1015,318 @@ AI Attivo: {'✅' if self.ai_enabled else '❌'}
             self.root.after(0, lambda: self._add_chat_message("Sistema", f"❌ Errore: {e}"))
 
     def _execute_ai_decision(self, decision: Dict[str, Any]):
-        """Esegui decisione AI"""
+        """Esegui decisione AI con timing intelligente"""
         try:
-            # Implementa logica per eseguire decisioni AI
+            self._log_status(f"🎛️ Executing AI decision: {decision}")
+
+            # Check for COMPLEX MIXING WORKFLOWS (highest priority)
+            if "complex_workflow" in decision:
+                self._log_status(f"🎛️ Detected COMPLEX MIXING workflow: {decision['complex_workflow']}")
+                self._execute_mixing_workflow(decision)
+                return
+
+            # Check for MIXING MODE commands
+            if "mixing_mode" in decision:
+                self._log_status(f"🎚️ Detected MIXING MODE: {decision['mixing_mode']}")
+                self._execute_simple_mixing(decision)
+                return
+
+            # Check for load+play combination (needs special timing)
+            has_load = "load_track" in decision
+            has_play = "play_deck" in decision or decision.get("play_track")
+
+            if has_load and has_play:
+                self._log_status(f"🔄 Detected LOAD+PLAY workflow - using intelligent timing")
+                self._execute_load_and_play_workflow(decision)
+                return
+
+            # Implementa logica per eseguire decisioni AI singole
             if "energy_change" in decision:
                 new_energy = self.dj_context.energy_level + int(decision["energy_change"])
                 new_energy = max(1, min(10, new_energy))
                 self.energy_var.set(new_energy)
+                self._log_status(f"⚡ Energy changed to {new_energy}/10")
 
             if "target_bpm" in decision and self.traktor_controller:
                 # Logica per BPM change
                 self._log_status(f"🎵 AI suggerisce BPM: {decision['target_bpm']}")
 
+            if "crossfader_move" in decision and self.traktor_controller:
+                position = decision["crossfader_move"] / 127.0  # Convert to 0.0-1.0
+                success = self.traktor_controller.set_crossfader(position)
+                self._log_status(f"🎛️ Crossfader moved to {position:.2f}: {'✅' if success else '❌'}")
+
+            # Load track only (no play)
+            if "load_track" in decision and not has_play and self.traktor_controller:
+                self._execute_load_command(decision)
+
+            # Play only (no load)
+            if has_play and not has_load and self.traktor_controller:
+                self._execute_play_command(decision)
+
         except Exception as e:
             self._log_status(f"❌ Errore esecuzione decisione AI: {e}")
+            import traceback
+            traceback.print_exc()
+
+    def _execute_load_and_play_workflow(self, decision: Dict[str, Any]):
+        """Esegui workflow load+play con timing corretto"""
+        try:
+            from traktor_control import DeckID
+
+            # Step 1: Load track
+            deck_letter = decision["load_track"].upper()
+            if deck_letter not in ["A", "B", "C", "D"]:
+                self._log_status(f"❌ Invalid deck letter: {deck_letter}")
+                return
+
+            deck = DeckID(deck_letter)
+            direction = decision.get("browse_direction", "down")
+
+            self._log_status(f"🎵 STEP 1: Loading track to Deck {deck_letter}...")
+            load_success = self.traktor_controller.load_next_track_smart(deck, direction)
+
+            if not load_success:
+                self._log_status(f"❌ Load failed - aborting workflow")
+                return
+
+            self._log_status(f"✅ Track loaded to Deck {deck_letter}")
+            self._add_chat_message("Sistema", f"🎵 Traccia caricata nel Deck {deck_letter}")
+
+            # Step 2: Wait for track to be ready
+            self._log_status(f"⏱️ STEP 2: Waiting for track to be ready (2s delay)...")
+            import time
+            time.sleep(2.0)  # Give Traktor time to load the track
+
+            # Step 3: Execute play command
+            play_deck_letter = deck_letter
+            if "play_deck" in decision:
+                play_deck_letter = decision["play_deck"].upper()
+
+            if play_deck_letter == deck_letter:
+                self._log_status(f"▶️ STEP 3: Playing loaded track in Deck {deck_letter}...")
+                play_success = self.traktor_controller.play_deck(deck)
+
+                if play_success:
+                    self._log_status(f"🎉 WORKFLOW SUCCESS: Deck {deck_letter} loaded and playing!")
+                    self._add_chat_message("Sistema", f"🎉 Deck {deck_letter} caricato e in riproduzione!")
+                else:
+                    self._log_status(f"❌ Play failed after successful load")
+                    self._add_chat_message("Sistema", f"⚠️ Traccia caricata ma play fallito in Deck {deck_letter}")
+            else:
+                self._log_status(f"⚠️ Play target ({play_deck_letter}) != Load target ({deck_letter})")
+
+        except Exception as e:
+            self._log_status(f"❌ Errore workflow load+play: {e}")
+            import traceback
+            traceback.print_exc()
+
+    def _execute_load_command(self, decision: Dict[str, Any]):
+        """Esegui solo comando load"""
+        try:
+            from traktor_control import DeckID
+            deck_letter = decision["load_track"].upper()
+            self._log_status(f"🎵 AI wants to load track in Deck {deck_letter}")
+
+            if deck_letter in ["A", "B", "C", "D"]:
+                deck = DeckID(deck_letter)
+                direction = decision.get("browse_direction", "down")
+
+                self._log_status(f"🎵 Loading track to Deck {deck_letter} via MIDI...")
+                success = self.traktor_controller.load_next_track_smart(deck, direction)
+
+                if success:
+                    self._log_status(f"✅ Track loaded to Deck {deck_letter} successfully!")
+                    self._add_chat_message("Sistema", f"🎵 Traccia caricata nel Deck {deck_letter}")
+                else:
+                    self._log_status(f"❌ Failed to load track to Deck {deck_letter}")
+            else:
+                self._log_status(f"❌ Invalid deck letter: {deck_letter}")
+        except Exception as e:
+            self._log_status(f"❌ Errore load command: {e}")
+
+    def _execute_play_command(self, decision: Dict[str, Any]):
+        """Esegui solo comando play"""
+        try:
+            from traktor_control import DeckID
+
+            # Play specific deck
+            if "play_deck" in decision:
+                deck_letter = decision["play_deck"].upper()
+                self._log_status(f"▶️ AI wants to play Deck {deck_letter}")
+
+                if deck_letter in ["A", "B", "C", "D"]:
+                    deck = DeckID(deck_letter)
+
+                    # Check if deck has a track loaded (via internal state)
+                    if hasattr(self.traktor_controller, 'deck_states'):
+                        deck_state = self.traktor_controller.deck_states.get(deck, {})
+                        if not deck_state.get('loaded', True):  # Assume loaded if no state
+                            self._log_status(f"⚠️ Warning: Deck {deck_letter} may not have a track loaded")
+
+                    self._log_status(f"▶️ Playing Deck {deck_letter} via MIDI...")
+                    success = self.traktor_controller.play_deck(deck)
+
+                    if success:
+                        self._log_status(f"✅ Deck {deck_letter} playing successfully!")
+                        self._add_chat_message("Sistema", f"▶️ Deck {deck_letter} sta suonando")
+                    else:
+                        self._log_status(f"❌ Failed to play Deck {deck_letter}")
+                else:
+                    self._log_status(f"❌ Invalid deck letter: {deck_letter}")
+
+            # Generic play command - for "play_track": true
+            elif decision.get("play_track"):
+                self._log_status(f"▶️ AI wants to play current track (default Deck A)")
+                deck = DeckID.A  # Default deck
+                success = self.traktor_controller.play_deck(deck)
+
+                if success:
+                    self._log_status(f"✅ Track playing successfully!")
+                    self._add_chat_message("Sistema", f"▶️ Traccia in riproduzione")
+                else:
+                    self._log_status(f"❌ Failed to play track")
+
+        except Exception as e:
+            self._log_status(f"❌ Errore play command: {e}")
+
+    def _execute_mixing_workflow(self, decision: Dict[str, Any]):
+        """Esegui workflow mixing complesso (es. load_B_and_mix)"""
+        try:
+            from traktor_control import DeckID
+            import time
+
+            workflow_type = decision.get("complex_workflow")
+            self._log_status(f"🎛️ Starting complex mixing workflow: {workflow_type}")
+
+            if workflow_type == "load_B_and_mix":
+                # FASE 1: Load Track nel Deck B
+                self._log_status(f"🎵 STEP 1: Loading track to Deck B...")
+                load_success = self.traktor_controller.load_next_track_smart(DeckID.B, "down")
+
+                if not load_success:
+                    self._log_status(f"❌ Load B failed - aborting mixing workflow")
+                    return
+
+                self._log_status(f"✅ Track loaded to Deck B")
+                self._add_chat_message("Sistema", f"🎵 Traccia caricata nel Deck B per mixing")
+
+                # FASE 2: Wait per track ready
+                self._log_status(f"⏱️ STEP 2: Waiting for Deck B track ready (2s)...")
+                time.sleep(2.0)
+
+                # FASE 3: Start playing Deck B
+                self._log_status(f"▶️ STEP 3: Starting Deck B playback...")
+                play_success = self.traktor_controller.play_deck(DeckID.B)
+
+                if not play_success:
+                    self._log_status(f"❌ Play B failed after load")
+                    return
+
+                self._log_status(f"✅ Deck B playing successfully")
+
+                # FASE 4: Begin crossfade transition
+                self._log_status(f"🎚️ STEP 4: Beginning crossfade transition A→B...")
+                time.sleep(1.0)  # Let deck B stabilize
+
+                # Start gradual crossfade
+                self._execute_gradual_crossfade("A_to_B", decision.get("crossfader_target", 127))
+
+            elif workflow_type == "load_A_and_mix":
+                # Similar logic for A side
+                self._log_status(f"🎵 STEP 1: Loading track to Deck A...")
+                load_success = self.traktor_controller.load_next_track_smart(DeckID.A, "down")
+
+                if load_success:
+                    self._log_status(f"✅ Track loaded to Deck A")
+                    time.sleep(2.0)
+                    self.traktor_controller.play_deck(DeckID.A)
+                    time.sleep(1.0)
+                    self._execute_gradual_crossfade("B_to_A", decision.get("crossfader_target", 0))
+
+            self._log_status(f"🎉 MIXING WORKFLOW COMPLETED!")
+            self._add_chat_message("Sistema", f"🎛️ Mixing workflow completato con successo!")
+
+        except Exception as e:
+            self._log_status(f"❌ Errore mixing workflow: {e}")
+            import traceback
+            traceback.print_exc()
+
+    def _execute_simple_mixing(self, decision: Dict[str, Any]):
+        """Esegui semplice mixing tra deck già caricati"""
+        try:
+            mixing_mode = decision.get("mixing_mode")
+            crossfader_target = decision.get("crossfader_target")
+
+            self._log_status(f"🎚️ Starting simple mixing: {mixing_mode}")
+
+            if crossfader_target is not None:
+                # Execute gradual crossfade
+                self._execute_gradual_crossfade(mixing_mode, crossfader_target)
+            else:
+                # Immediate crossfader move
+                if "crossfader_move" in decision:
+                    position = decision["crossfader_move"] / 127.0
+                    success = self.traktor_controller.set_crossfader(position)
+                    self._log_status(f"🎛️ Crossfader moved to {position:.2f}: {'✅' if success else '❌'}")
+
+            # Handle volume adjustments
+            if "volume_deck_a" in decision:
+                volume = decision["volume_deck_a"] / 127.0
+                success = self.traktor_controller.set_deck_volume(DeckID.A, volume)
+                self._log_status(f"🔊 Deck A volume: {volume:.2f} {'✅' if success else '❌'}")
+
+            if "volume_deck_b" in decision:
+                volume = decision["volume_deck_b"] / 127.0
+                success = self.traktor_controller.set_deck_volume(DeckID.B, volume)
+                self._log_status(f"🔊 Deck B volume: {volume:.2f} {'✅' if success else '❌'}")
+
+            self._add_chat_message("Sistema", f"🎚️ Mixing eseguito: {mixing_mode}")
+
+        except Exception as e:
+            self._log_status(f"❌ Errore simple mixing: {e}")
+
+    def _execute_gradual_crossfade(self, mixing_mode: str, target_value: int):
+        """Esegui crossfade graduale per transizioni smooth"""
+        try:
+            import time
+            from traktor_control import DeckID
+
+            self._log_status(f"🌀 Starting gradual crossfade: {mixing_mode} → {target_value}")
+
+            # Get current crossfader position (assume center if unknown)
+            start_position = 64  # Center position
+            target_position = target_value
+
+            # Calculate steps for smooth transition
+            steps = 5
+            step_size = (target_position - start_position) / steps
+            step_delay = 0.8  # 800ms between steps
+
+            for i in range(steps + 1):
+                current_pos = int(start_position + (step_size * i))
+                position_float = current_pos / 127.0
+
+                success = self.traktor_controller.set_crossfader(position_float)
+                self._log_status(f"🎚️ Crossfade step {i+1}/{steps+1}: {position_float:.2f} {'✅' if success else '❌'}")
+
+                if i < steps:  # Don't wait after last step
+                    time.sleep(step_delay)
+
+            self._log_status(f"✅ Gradual crossfade completed: {target_position}/127")
+
+            # Adjust volumes for better mix
+            if mixing_mode == "A_to_B":
+                # Boost B slightly, reduce A slightly
+                self.traktor_controller.set_deck_volume(DeckID.B, 0.85)
+                self.traktor_controller.set_deck_volume(DeckID.A, 0.75)
+            elif mixing_mode == "B_to_A":
+                # Boost A slightly, reduce B slightly
+                self.traktor_controller.set_deck_volume(DeckID.A, 0.85)
+                self.traktor_controller.set_deck_volume(DeckID.B, 0.75)
+
+        except Exception as e:
+            self._log_status(f"❌ Errore gradual crossfade: {e}")
 
     def _add_chat_message(self, sender: str, message: str):
         """Aggiungi messaggio alla chat"""

@@ -88,6 +88,24 @@ class AutonomousSession:
         if self.transition_quality is None:
             self.transition_quality = []
 
+@dataclass
+class MixSession:
+    """Sessione di mixing DJ"""
+    venue_type: str
+    event_type: str
+    target_duration: int = 60  # minuti
+    session_start: float = 0.0
+    tracks_played: List[str] = None
+    energy_progression: List[float] = None
+
+    def __post_init__(self):
+        if self.tracks_played is None:
+            self.tracks_played = []
+        if self.energy_progression is None:
+            self.energy_progression = []
+        if self.session_start == 0.0:
+            self.session_start = time.time()
+
     def get_session_stats(self) -> Dict[str, Any]:
         """Statistiche sessione"""
         session_time = (time.time() - self.session_start) / 60 if self.session_start else 0
@@ -98,7 +116,6 @@ class AutonomousSession:
             'avg_energy': sum(self.energy_progression) / len(self.energy_progression) if self.energy_progression else 0,
             'venue_type': self.venue_type,
             'event_type': self.event_type,
-            'current_energy': self.energy_progression[-1] if self.energy_progression else 5
         }
 
 class SimpleDJAgent:

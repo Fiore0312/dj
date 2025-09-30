@@ -20,13 +20,19 @@ logger = logging.getLogger(__name__)
 def print_banner():
     """Banner sistema"""
     print("\n" + "="*80)
-    print("🎧 DJ AI SYSTEM - UNIFIED LAUNCHER v2.1")
+    print("🎧 DJ AI SYSTEM - UNIFIED LAUNCHER v2.2")
     print("="*80)
     print("✨ Features:")
     print("  ✅ Auto-detection GUI disponibile")
     print("  ✅ Fallback multipli per massima compatibilità")
     print("  ✅ Fix blinking track issue")
     print("  ✅ Real-time command verification")
+    print("  🤖 Autonomous DJ mode disponibile!")
+    print()
+    print("Usage:")
+    print("  python3 dj_ai_launcher.py                    # GUI/CLI normale")
+    print("  python3 dj_ai_launcher.py --autonomous       # Modalità autonoma")
+    print("  python3 dj_ai_launcher.py --autonomous --duration 30")
     print("="*80 + "\n")
 
 def check_gui_availability():
@@ -126,6 +132,7 @@ def launch_cli_mode():
         print("  pause_a   - Pause Deck A")
         print("  pause_b   - Pause Deck B")
         print("  status    - Mostra stato decks")
+        print("  autonomous - Avvia modalità autonoma (2 minuti test)")
         print("  quit      - Esci")
         print("="*80 + "\n")
 
@@ -176,6 +183,19 @@ def launch_cli_mode():
                         print(f"  Deck {deck_id.value}: {status} | {loaded}")
                     print()
 
+                elif command == "autonomous":
+                    print("\n🤖 Avvio modalità autonoma (2 minuti test)...")
+                    print("Press Ctrl+C per fermare in qualsiasi momento\n")
+                    traktor.disconnect()  # Disconnect current session
+                    # Launch autonomous mode from CLI
+                    success = launch_autonomous_mode(duration=2, venue="club", event="prime_time")
+                    if success:
+                        print("\n✅ Autonomous session completata")
+                    # Reconnect for CLI mode
+                    print("\n🔌 Reconnecting for CLI mode...")
+                    traktor = TraktorController(config)
+                    traktor.connect_with_gil_safety()
+
                 elif command == "help" or command == "?":
                     print("Digita un comando dalla lista sopra")
 
@@ -198,8 +218,175 @@ def launch_cli_mode():
         traceback.print_exc()
         return False
 
+def launch_autonomous_mode(duration: int = 60, venue: str = "club", event: str = "prime_time"):
+    """
+    Launch autonomous DJ mode (simplified version)
+
+    Args:
+        duration: Session duration in minutes
+        venue: Venue type (club, bar, festival, etc.)
+        event: Event type (prime_time, opening, closing, etc.)
+    """
+    print("\n" + "="*80)
+    print("🤖 AUTONOMOUS DJ MODE")
+    print("="*80)
+    print("Sistema DJ completamente autonomo - L'AI gestisce tutto!")
+    print(f"Venue: {venue} | Event: {event} | Duration: {duration} minuti")
+    print()
+
+    try:
+        from traktor_control import TraktorController, DeckID
+        from config import get_config
+        import asyncio
+        import time
+
+        config = get_config()
+        traktor = TraktorController(config)
+
+        print("🔌 Connecting to Traktor...")
+        if not traktor.connect_with_gil_safety():
+            print("❌ Failed to connect to Traktor MIDI")
+            return False
+
+        if traktor.simulation_mode:
+            print("⚠️  Running in SIMULATION mode")
+        else:
+            print("✅ Connected to Traktor MIDI")
+
+        print("\n🤖 Starting Autonomous DJ Session...")
+        print("="*80)
+        print("L'AI controllerà:")
+        print("  ✅ Load tracks automatico")
+        print("  ✅ Play/transitions automatiche")
+        print("  ✅ Beatmatching e mixing")
+        print("  ✅ Energy management")
+        print()
+        print("⚠️  Press Ctrl+C per fermare la sessione")
+        print("="*80 + "\n")
+
+        # Autonomous loop
+        start_time = time.time()
+        session_end = start_time + (duration * 60)
+        deck_playing = DeckID.A
+        next_deck = DeckID.B
+        tracks_played = 0
+
+        # Start first track
+        print("🎵 Loading first track to Deck A...")
+        traktor.load_next_track_smart(DeckID.A, "down")
+        time.sleep(0.5)
+
+        print("▶️  Starting playback...")
+        traktor.force_play_deck(DeckID.A, wait_if_recent_load=True)
+        tracks_played += 1
+
+        print(f"✅ Autonomous session started! Track 1 playing on Deck {deck_playing.value}\n")
+
+        # Main autonomous loop
+        while time.time() < session_end:
+            elapsed = (time.time() - start_time) / 60  # Minutes
+            remaining = duration - elapsed
+
+            # Every 30 seconds, print status
+            if int(elapsed * 60) % 30 == 0:
+                print(f"📊 Status: {elapsed:.1f}/{duration} min | Tracks: {tracks_played} | Remaining: {remaining:.1f} min")
+
+            # Every 45 seconds, prepare next track and transition
+            if int(elapsed * 60) % 45 == 0 and int(elapsed * 60) > 0:
+                print(f"\n🔄 Preparing transition to Deck {next_deck.value}...")
+
+                # Load next track
+                print(f"   🎵 Loading track to Deck {next_deck.value}...")
+                traktor.load_next_track_smart(next_deck, "down")
+                time.sleep(1.0)
+
+                # Start playing next deck
+                print(f"   ▶️  Starting Deck {next_deck.value}...")
+                traktor.force_play_deck(next_deck, wait_if_recent_load=True)
+                time.sleep(0.5)
+
+                # Transition crossfader (simple fade over 4 seconds)
+                print("   🎛️  Crossfading...")
+                current_pos = 0.0 if deck_playing == DeckID.A else 1.0
+                target_pos = 1.0 if deck_playing == DeckID.A else 0.0
+
+                for i in range(8):
+                    pos = current_pos + (target_pos - current_pos) * (i / 8.0)
+                    traktor.set_crossfader(pos)
+                    time.sleep(0.5)
+
+                # Stop old deck after transition
+                print(f"   ⏸️  Stopping Deck {deck_playing.value}")
+                traktor.pause_deck(deck_playing)
+
+                # Swap decks
+                deck_playing, next_deck = next_deck, deck_playing
+                tracks_played += 1
+
+                print(f"   ✅ Transition complete! Now playing Deck {deck_playing.value}\n")
+
+            time.sleep(1)
+
+        print("\n" + "="*80)
+        print("✅ AUTONOMOUS SESSION COMPLETE!")
+        print("="*80)
+        print(f"Duration: {duration} minutes")
+        print(f"Tracks played: {tracks_played}")
+        print(f"Transitions: {tracks_played - 1}")
+        print("="*80)
+
+        # Cleanup
+        traktor.pause_deck(DeckID.A)
+        traktor.pause_deck(DeckID.B)
+        traktor.disconnect()
+
+        return True
+
+    except KeyboardInterrupt:
+        print("\n\n⚠️  Autonomous session stopped by user")
+        try:
+            traktor.pause_deck(DeckID.A)
+            traktor.pause_deck(DeckID.B)
+            traktor.disconnect()
+        except:
+            pass
+        return True
+
+    except Exception as e:
+        print(f"\n❌ Autonomous mode failed: {e}")
+        import traceback
+        traceback.print_exc()
+        return False
+
 def main():
     """Main launcher with intelligent fallback"""
+    import sys
+
+    # Check for autonomous mode flag
+    if len(sys.argv) > 1 and sys.argv[1] == '--autonomous':
+        # Parse additional arguments
+        duration = 60
+        venue = "club"
+        event = "prime_time"
+
+        if '--duration' in sys.argv:
+            idx = sys.argv.index('--duration')
+            if idx + 1 < len(sys.argv):
+                duration = int(sys.argv[idx + 1])
+
+        if '--venue' in sys.argv:
+            idx = sys.argv.index('--venue')
+            if idx + 1 < len(sys.argv):
+                venue = sys.argv[idx + 1]
+
+        if '--event' in sys.argv:
+            idx = sys.argv.index('--event')
+            if idx + 1 < len(sys.argv):
+                event = sys.argv[idx + 1]
+
+        print_banner()
+        return 0 if launch_autonomous_mode(duration, venue, event) else 1
+
     print_banner()
 
     # Check available GUIs

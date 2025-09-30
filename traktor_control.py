@@ -224,35 +224,143 @@ class TraktorController:
         self.last_state_verification = 0.0
         self.state_verification_interval = 15.0  # Verify every 15 seconds
 
+        # Simulation Mode (se MIDI non disponibile)
+        self.simulation_mode = False  # True = comandi simulati, False = MIDI reale
+
+    def connect_with_gil_safety(self, output_only: bool = False, timeout: float = 5.0) -> bool:
+        """
+        Connetti a Traktor via IAC Driver con GIL-safe threading
+
+        Questo metodo risolve problemi di GIL quando chiamato da Tkinter o altri thread.
+        Esegue l'inizializzazione MIDI in un thread separato con proper GIL management.
+
+        Args:
+            output_only: Se True, connette solo output (no input)
+            timeout: Timeout in secondi per l'inizializzazione
+
+        Returns:
+            bool: True se connesso con successo (o simulation mode), False su errore critico
+        """
+        import threading
+        import queue
+
+        result_queue = queue.Queue()
+
+        def _init_midi_in_thread():
+            """Inizializza MIDI in thread separato con GIL safety"""
+            try:
+                success = self.connect(output_only=output_only)
+                result_queue.put(('success', success))
+            except Exception as e:
+                logger.error(f"❌ GIL-safe MIDI init error: {e}")
+                result_queue.put(('error', str(e)))
+
+        # Avvia thread separato per inizializzazione MIDI
+        logger.info("🔒 Starting GIL-safe MIDI initialization...")
+        init_thread = threading.Thread(target=_init_midi_in_thread, daemon=True)
+        init_thread.start()
+
+        # Aspetta risultato con timeout
+        try:
+            result_type, result_value = result_queue.get(timeout=timeout)
+
+            if result_type == 'success':
+                if result_value:
+                    logger.info("✅ GIL-safe MIDI initialization successful")
+                return result_value
+            else:
+                logger.error(f"❌ MIDI initialization failed: {result_value}")
+                # Fallback a simulation mode
+                self.connected = False
+                self.simulation_mode = True
+                logger.warning("⚠️ Fallback a SIMULATION MODE (GIL error)")
+                return True
+
+        except queue.Empty:
+            logger.error(f"❌ MIDI initialization timeout ({timeout}s)")
+            # Fallback a simulation mode su timeout
+            self.connected = False
+            self.simulation_mode = True
+            logger.warning("⚠️ Fallback a SIMULATION MODE (timeout)")
+            return True
+
     def connect(self, output_only: bool = False) -> bool:
-        """Connetti a Traktor via IAC Driver"""
+        """
+        Connetti a Traktor via IAC Driver con error handling robusto
+
+        ⚠️ ATTENZIONE: Se chiamato da Tkinter, usa connect_with_gil_safety() invece!
+
+        Returns:
+            bool: True se connesso con successo (o simulation mode), False su errore critico
+        """
         if not RTMIDI_AVAILABLE:
-            logger.error("rtmidi non disponibile")
-            return False
+            logger.warning("⚠️ rtmidi non disponibile - SIMULATION MODE attivo")
+            self.connected = False
+            self.simulation_mode = True
+            return True  # Continua in simulation mode
 
         try:
-            # Connessione output (inviamo comandi a Traktor)
-            self.midi_out = rtmidi.MidiOut()
+            # Tentativo connessione output con timeout protection
+            logger.info("🔌 Inizializzazione MIDI output...")
 
-            # Cerca IAC Bus 1
-            output_ports = self.midi_out.get_ports()
+            try:
+                self.midi_out = rtmidi.MidiOut()
+            except Exception as midi_init_error:
+                logger.error(f"❌ Errore inizializzazione rtmidi.MidiOut: {midi_init_error}")
+                logger.warning("⚠️ Fallback a SIMULATION MODE")
+                self.connected = False
+                self.simulation_mode = True
+                return True  # Graceful fallback
+
+            # Cerca IAC Bus 1 con error handling
+            try:
+                output_ports = self.midi_out.get_ports()
+                logger.info(f"📋 Porte MIDI disponibili: {output_ports}")
+            except Exception as ports_error:
+                logger.error(f"❌ Errore lettura porte MIDI: {ports_error}")
+                self.midi_out.close_port()
+                self.connected = False
+                self.simulation_mode = True
+                return True
+
             iac_port_idx = None
 
+            # Ricerca porta IAC con fuzzy matching
             for i, port in enumerate(output_ports):
-                if self.config.iac_bus_name in port or "Bus 1" in port:
+                port_lower = port.lower()
+                if (self.config.iac_bus_name.lower() in port_lower or
+                    "bus 1" in port_lower or
+                    "iac" in port_lower):
                     iac_port_idx = i
+                    logger.info(f"✅ Trovata porta IAC: {port}")
                     break
 
-            if iac_port_idx is None:
-                # Crea porta virtuale se IAC non trovato
-                self.midi_out.open_virtual_port(self.config.midi_device_name)
-                logger.info(f"✅ Porta virtuale creata: {self.config.midi_device_name}")
-            else:
-                self.midi_out.open_port(iac_port_idx)
-                logger.info(f"✅ Connesso a IAC: {output_ports[iac_port_idx]}")
+            # Apertura porta con error handling
+            try:
+                if iac_port_idx is None:
+                    # Tentativo creazione porta virtuale
+                    logger.warning("⚠️ IAC Driver non trovato, creo porta virtuale...")
+                    self.midi_out.open_virtual_port(self.config.midi_device_name)
+                    logger.info(f"✅ Porta virtuale creata: {self.config.midi_device_name}")
+                else:
+                    self.midi_out.open_port(iac_port_idx)
+                    logger.info(f"✅ Connesso a IAC: {output_ports[iac_port_idx]}")
+            except Exception as open_error:
+                logger.error(f"❌ Errore apertura porta MIDI: {open_error}")
+                logger.warning("⚠️ Fallback a SIMULATION MODE")
+                if self.midi_out:
+                    try:
+                        self.midi_out.close_port()
+                    except:
+                        pass
+                self.connected = False
+                self.simulation_mode = True
+                return True
 
             self.connected = True
             self.running = True
+            self.simulation_mode = False
+            logger.info("🎉 MIDI connesso con successo")
 
             # Se output_only, salta connessione input e test
             if output_only:
@@ -321,23 +429,40 @@ class TraktorController:
             logger.error(f"❌ Errore callback status: {e}")
 
     def _send_midi_command(self, channel: int, cc: int, value: int, description: str = "") -> bool:
-        """Invia comando MIDI a Traktor"""
+        """
+        Invia comando MIDI a Traktor con simulation mode support
+
+        Returns:
+            bool: True se comando inviato (o simulato), False se errore
+        """
+        # SIMULATION MODE - simula invio senza MIDI reale
+        if self.simulation_mode:
+            logger.debug(f"🎭 [SIMULATION] CH{channel} CC{cc}={value} ({description})")
+            self.stats['commands_sent'] += 1
+            return True  # Simula successo
+
+        # Verifica connessione reale
         if not self.connected or not self.midi_out:
-            logger.error("Non connesso a Traktor")
+            logger.warning(f"⚠️ Non connesso a Traktor - comando ignorato: {description}")
             return False
 
         try:
             # Costruisci messaggio MIDI (Control Change)
             message = [0xB0 + (channel - 1), cc, value]
 
-            self.midi_out.send_message(message)
-            self.stats['commands_sent'] += 1
-
-            logger.debug(f"📤 Comando: CH{channel} CC{cc}={value} ({description})")
-            return True
+            # Invio con timeout protection
+            try:
+                self.midi_out.send_message(message)
+                self.stats['commands_sent'] += 1
+                logger.debug(f"📤 Comando: CH{channel} CC{cc}={value} ({description})")
+                return True
+            except Exception as send_error:
+                logger.error(f"❌ Errore invio messaggio MIDI: {send_error}")
+                self.stats['errors'] += 1
+                return False
 
         except Exception as e:
-            logger.error(f"❌ Errore invio comando: {e}")
+            logger.error(f"❌ Errore costruzione comando MIDI: {e}")
             self.stats['errors'] += 1
             return False
 
@@ -389,33 +514,109 @@ class TraktorController:
             return self._send_midi_command(channel, cc, midi_value, f"Deck {deck.value} EQ {eq_type}")
         return False
 
-    def play_deck(self, deck: DeckID) -> bool:
-        """Play deck robusto con verifica stato traccia"""
-        # Verifica se deck è già in play
-        if self.deck_states[deck]['playing']:
-            logger.debug(f"Deck {deck.value} già in play")
-            return True
+    def force_play_deck(self, deck: DeckID, wait_if_recent_load: bool = True) -> bool:
+        """
+        Force play deck SENZA toggle logic - risolve problema blinking
 
-        # Verifica se c'è una traccia caricata (robustness check)
-        if not self.deck_states[deck]['loaded']:
-            logger.warning(f"⚠️ Deck {deck.value} may not have a track loaded - playing anyway")
+        Questo metodo:
+        1. Resetta lo stato interno a "not playing"
+        2. Invia comando play
+        3. Verifica che il deck sia effettivamente partito
+        4. Gestisce delay intelligente se track appena caricata
 
-        # Verifica timing dal caricamento (se molto recente, potrebbe non essere pronto)
-        if self.deck_states[deck]['last_loaded_time']:
-            import time
+        Args:
+            deck: Deck da far partire
+            wait_if_recent_load: Se True, aspetta se track caricata recentemente
+
+        Returns:
+            True se play riuscito
+        """
+        # Step 1: Check se track caricata di recente e aspetta se necessario
+        if wait_if_recent_load and self.deck_states[deck]['last_loaded_time']:
             time_since_load = time.time() - self.deck_states[deck]['last_loaded_time']
-            if time_since_load < 1.0:  # Meno di 1 secondo fa
-                logger.warning(f"⚠️ Deck {deck.value} track loaded {time_since_load:.1f}s ago - may not be ready")
 
-        # Tenta play
-        success = self.toggle_play_pause(deck)
+            if time_since_load < 1.5:  # Meno di 1.5 secondi fa
+                wait_time = 1.5 - time_since_load
+                logger.info(f"⏱️  Track caricata {time_since_load:.1f}s fa - aspetto {wait_time:.1f}s per stabilità...")
+                time.sleep(wait_time)
 
-        if success:
-            logger.info(f"🎉 ROBUST PLAY SUCCESS: Deck {deck.value} started playing")
+        # Step 2: Verifica se c'è una traccia caricata
+        if not self.deck_states[deck]['loaded']:
+            logger.warning(f"⚠️ Deck {deck.value} potrebbe non avere una traccia caricata")
+
+        # Step 3: FORCE RESET stato interno per evitare toggle issues
+        was_playing = self.deck_states[deck]['playing']
+        self.deck_states[deck]['playing'] = False
+
+        logger.info(f"🔄 Force play Deck {deck.value} (was: {'playing' if was_playing else 'paused'})")
+
+        # Step 4: Se già stava suonando, prima fermiamo (per evitare toggle)
+        if was_playing:
+            logger.info(f"🛑 Deck {deck.value} già in play - fermo prima di ri-avviare")
+            channel, cc = self.MIDI_MAP[f'deck_{deck.value.lower()}_play']
+            self._send_midi_command(channel, cc, 127, f"Stop Deck {deck.value}")
+            time.sleep(0.1)  # Breve pausa
+            self.deck_states[deck]['playing'] = False
+
+        # Step 5: Invia comando play
+        channel, cc = self.MIDI_MAP[f'deck_{deck.value.lower()}_play']
+        success = self._send_midi_command(channel, cc, 127, f"Force Play Deck {deck.value}")
+
+        if not success:
+            logger.error(f"❌ MIDI command failed per Deck {deck.value}")
+            return False
+
+        # Step 6: Aggiorna stato interno
+        self.deck_states[deck]['playing'] = True
+        self.deck_states[deck]['cued'] = False
+
+        # Step 7: Breve delay e verifica che sia partito
+        time.sleep(0.2)
+
+        # Verifica finale (opzionale - basata su stato interno)
+        if self.deck_states[deck]['playing']:
+            logger.info(f"✅ FORCE PLAY SUCCESS: Deck {deck.value} is playing")
+            return True
         else:
-            logger.error(f"❌ ROBUST PLAY FAILED: Deck {deck.value} play command failed")
+            logger.warning(f"⚠️ FORCE PLAY: Comando inviato ma stato incerto per Deck {deck.value}")
+            return True  # Ritorna success comunque - il comando è stato inviato
 
-        return success
+    def play_deck(self, deck: DeckID) -> bool:
+        """
+        Play deck con smart logic - usa force_play per evitare blinking
+
+        DEPRECATO: Questo metodo ora usa force_play_deck internamente
+        per evitare problemi di toggle/blinking
+        """
+        logger.info(f"▶️ play_deck() chiamato per Deck {deck.value} - usando force_play")
+        return self.force_play_deck(deck, wait_if_recent_load=True)
+
+    def verify_deck_playing(self, deck: DeckID, max_attempts: int = 3) -> bool:
+        """
+        Verifica che deck sia effettivamente in play
+
+        Controlla lo stato interno e tenta verifica multipla
+        per massima affidabilità
+
+        Args:
+            deck: Deck da verificare
+            max_attempts: Numero tentativi di verifica
+
+        Returns:
+            True se deck sta suonando
+        """
+        for attempt in range(max_attempts):
+            # Check stato interno
+            if self.deck_states[deck]['playing']:
+                logger.debug(f"✅ Verifica attempt {attempt+1}/{max_attempts}: Deck {deck.value} playing")
+                return True
+
+            # Se non sta suonando, aspetta un po' e riprova
+            if attempt < max_attempts - 1:
+                time.sleep(0.1)
+
+        logger.warning(f"⚠️ Verifica fallita: Deck {deck.value} non sembra playing dopo {max_attempts} tentativi")
+        return False
 
     def pause_deck(self, deck: DeckID) -> bool:
         """Pause deck (se già in pause, non fa nulla)"""

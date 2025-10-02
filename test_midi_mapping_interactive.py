@@ -31,6 +31,17 @@ class InteractiveMIDITester:
         # Initialize config
         self.config = DJConfig()
         self.traktor = TraktorController(self.config)
+
+        # Connect to Traktor via MIDI
+        print("\n🔌 Connecting to Traktor via IAC Driver...")
+        if not self.traktor.connect_with_gil_safety(output_only=True):
+            print("❌ Failed to connect to Traktor MIDI")
+            print("   Please check:")
+            print("   1. IAC Driver Bus 1 is enabled in Audio MIDI Setup")
+            print("   2. Traktor Pro 3 is running")
+            sys.exit(1)
+        print("✅ Connected to Traktor MIDI successfully!\n")
+
         self.results = {
             "test_date": datetime.now().isoformat(),
             "total_commands": 0,

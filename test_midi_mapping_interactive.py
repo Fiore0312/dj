@@ -257,7 +257,7 @@ class InteractiveMIDITester:
         # Ask for confirmation
         while True:
             print("\n" + "-"*60)
-            response = input("✅ Hai visto funzionare il comando? (s/n/q/skip): ").lower().strip()
+            response = input("✅ Hai visto funzionare il comando? (s/n/r/skip/q): ").lower().strip()
 
             if response == 's':
                 print("✅ PASSED")
@@ -282,6 +282,14 @@ class InteractiveMIDITester:
                     "description": description
                 }
 
+            elif response == 'r':
+                print("🔁 RIPETO COMANDO...")
+                # Resend the command
+                self._send_test_command(channel, cc, 127)
+                time.sleep(1.5)
+                print("📡 Comando ripetuto! Osserva Traktor...")
+                # Loop continues to ask again
+
             elif response == 'skip':
                 print("⏭️ SKIPPED")
                 return {
@@ -295,7 +303,12 @@ class InteractiveMIDITester:
                 return {"status": "quit"}
 
             else:
-                print("❌ Risposta non valida. Usa: s (sì), n (no), skip (salta), q (termina)")
+                print("❌ Risposta non valida. Usa:")
+                print("   s = funziona ✅")
+                print("   n = non funziona ❌")
+                print("   r = ripeti comando 🔁")
+                print("   skip = salta ⏭️")
+                print("   q = termina e salva")
 
     def test_category(self, category_name: str, commands: List[Tuple[str, Tuple[int, int]]]):
         """Test all commands in a category"""

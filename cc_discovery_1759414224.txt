@@ -1,0 +1,28 @@
+CC DISCOVERY RESULTS
+============================================================
+
+CC 1: nulla
+CC 2: nulla
+CC 3: nulla
+CC 4: nulla
+CC 5: nulla
+CC 6: n ulla
+CC 7: n ulla
+CC 8: nulla
+CC 9: n ulla
+CC 10: nulla
+CC 11: nulla
+CC 12: nulla
+CC 13: nulla
+CC 14: nulla
+CC 15: nulla
+CC 16: nulla
+CC 17: nulla
+CC 18: nulla
+CC 19: nulla
+CC 20: ha fatto partire la traccia nel deck A
+CC 21: ha fatto partire la traccia nel deck B
+CC 22: nulla
+CC 23: nulla
+CC 24: ha spostato la traccia allinenando il primo grid nel deck A
+CC 25: ha spostato la traccia allinenando il primo grid nel deck B

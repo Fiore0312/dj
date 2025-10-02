@@ -60,64 +60,93 @@ class TraktorStatus:
 class TraktorController:
     """Controller semplificato per Traktor"""
 
-    # Mappatura MIDI CC corretta per controlli standard Traktor
-    # Basata sui mapping standard e verificata con test tool
+    # Mappatura MIDI CC - VERIFIED WORKING MAPPINGS
+    # Source: User discovery testing with test_cc_discovery.py
+    # Date: 2025-10-03
+    # Status: CONFIRMED on IAC Driver Bus 1, Channel 1
+    # See: TRAKTOR_ACTUAL_CC_MAPPINGS.md for complete documentation
     MIDI_MAP = {
-        # TRANSPORT CONTROLS - Compatibili con Traktor standard
-        'deck_a_play': (MIDIChannel.AI_CONTROL.value, 20),
-        'deck_b_play': (MIDIChannel.AI_CONTROL.value, 21),
-        'deck_c_play': (MIDIChannel.AI_CONTROL.value, 22),
-        'deck_d_play': (MIDIChannel.AI_CONTROL.value, 23),
+        # ===== TRANSPORT CONTROLS =====
+        # ✅ CONFIRMED WORKING
+        'deck_a_play': (MIDIChannel.AI_CONTROL.value, 20),  # ✅ Tested
+        'deck_b_play': (MIDIChannel.AI_CONTROL.value, 21),  # ✅ Tested
+        'deck_a_cue': (MIDIChannel.AI_CONTROL.value, 39),   # ✅ Tested - Flash/blink
+        'deck_a_sync_grid': (MIDIChannel.AI_CONTROL.value, 24),  # ✅ Tested - Align to grid
+        'deck_b_sync_grid': (MIDIChannel.AI_CONTROL.value, 25),  # ✅ Tested - Align to grid
 
-        'deck_a_cue': (MIDIChannel.AI_CONTROL.value, 24),
-        'deck_b_cue': (MIDIChannel.AI_CONTROL.value, 25),
-        'deck_c_cue': (MIDIChannel.AI_CONTROL.value, 26),
-        'deck_d_cue': (MIDIChannel.AI_CONTROL.value, 27),
+        # NOT YET MAPPED - Use available CCs
+        'deck_c_play': (MIDIChannel.AI_CONTROL.value, 22),  # ⚠️ NOT TESTED
+        'deck_d_play': (MIDIChannel.AI_CONTROL.value, 23),  # ⚠️ NOT TESTED
+        'deck_b_cue': (MIDIChannel.AI_CONTROL.value, 26),   # ⚠️ NOT TESTED
+        'deck_c_cue': (MIDIChannel.AI_CONTROL.value, 27),   # ⚠️ NOT TESTED
+        'deck_d_cue': (MIDIChannel.AI_CONTROL.value, 88),   # ⚠️ NOT TESTED
 
-        # VOLUME CONTROLS - Standard range per evitare conflitti
-        'deck_a_volume': (MIDIChannel.AI_CONTROL.value, 28),
-        'deck_b_volume': (MIDIChannel.AI_CONTROL.value, 29),
-        'deck_c_volume': (MIDIChannel.AI_CONTROL.value, 30),
-        'deck_d_volume': (MIDIChannel.AI_CONTROL.value, 31),
+        # ===== VOLUME CONTROLS =====
+        # ✅ CONFIRMED WORKING
+        'deck_a_volume': (MIDIChannel.AI_CONTROL.value, 28),  # ✅ Tested
+        'deck_b_volume': (MIDIChannel.AI_CONTROL.value, 29),  # ⚠️ CONFLICT - also controls pitch!
+        'crossfader': (MIDIChannel.AI_CONTROL.value, 32),     # ✅ Tested (left/right/center)
+        'master_volume': (MIDIChannel.AI_CONTROL.value, 33),  # ✅ Tested
 
-        # CROSSFADER E MASTER - Range alto per evitare conflitti
-        'crossfader': (MIDIChannel.AI_CONTROL.value, 32),
-        'master_volume': (MIDIChannel.AI_CONTROL.value, 33),
+        # NOT YET MAPPED
+        'deck_c_volume': (MIDIChannel.AI_CONTROL.value, 30),  # ⚠️ Available CC, not mapped
+        'deck_d_volume': (MIDIChannel.AI_CONTROL.value, 31),  # ⚠️ Available CC, not mapped
 
-        # EQ CONTROLS - Range dedicato per Deck A
-        'deck_a_eq_high': (MIDIChannel.AI_CONTROL.value, 34),
-        'deck_a_eq_mid': (MIDIChannel.AI_CONTROL.value, 35),
-        'deck_a_eq_low': (MIDIChannel.AI_CONTROL.value, 36),
+        # ===== EQ CONTROLS =====
+        # ✅ CONFIRMED WORKING - Deck A
+        'deck_a_eq_high': (MIDIChannel.AI_CONTROL.value, 34),  # ✅ Tested
+        'deck_a_eq_mid': (MIDIChannel.AI_CONTROL.value, 35),   # ✅ Tested
+        'deck_a_eq_low': (MIDIChannel.AI_CONTROL.value, 36),   # ✅ Tested
 
-        # BROWSER CONTROLS - Essenziali per track loading
-        'browser_up': (MIDIChannel.AI_CONTROL.value, 37),
-        'browser_down': (MIDIChannel.AI_CONTROL.value, 38),
-        'browser_load_deck_a': (MIDIChannel.AI_CONTROL.value, 39),
-        'browser_load_deck_b': (MIDIChannel.AI_CONTROL.value, 40),
-        'browser_select_item': (MIDIChannel.AI_CONTROL.value, 49),  # Browser enter/select
+        # ✅ CONFIRMED WORKING - Deck B
+        'deck_b_eq_high': (MIDIChannel.AI_CONTROL.value, 50),  # ✅ Tested
+        'deck_b_eq_mid': (MIDIChannel.AI_CONTROL.value, 51),   # ✅ Tested
+        'deck_b_eq_low': (MIDIChannel.AI_CONTROL.value, 52),   # ✅ Tested
 
-        # SYNC CONTROLS - Range dedicato
-        'deck_a_sync': (MIDIChannel.AI_CONTROL.value, 41),
-        'deck_b_sync': (MIDIChannel.AI_CONTROL.value, 42),
-        'deck_c_sync': (MIDIChannel.AI_CONTROL.value, 43),
-        'deck_d_sync': (MIDIChannel.AI_CONTROL.value, 44),
+        # NOT YET MAPPED - Deck C/D
+        'deck_c_eq_high': (MIDIChannel.AI_CONTROL.value, 61),  # ⚠️ Available CC
+        'deck_c_eq_mid': (MIDIChannel.AI_CONTROL.value, 62),   # ⚠️ Available CC
+        'deck_c_eq_low': (MIDIChannel.AI_CONTROL.value, 63),   # ⚠️ Available CC
 
-        # PITCH CONTROLS - Range dedicato
-        'deck_a_pitch': (MIDIChannel.AI_CONTROL.value, 45),
-        'deck_b_pitch': (MIDIChannel.AI_CONTROL.value, 46),
-        'deck_c_pitch': (MIDIChannel.AI_CONTROL.value, 47),
-        'deck_d_pitch': (MIDIChannel.AI_CONTROL.value, 48),
+        # ===== PITCH/TEMPO CONTROLS =====
+        # ✅ CONFIRMED WORKING
+        'deck_a_pitch': (MIDIChannel.AI_CONTROL.value, 41),  # ✅ Tested
+        'deck_b_pitch': (MIDIChannel.AI_CONTROL.value, 40),  # ✅ Tested (moves all the way down)
+        # Note: CC 42 also controls Deck B pitch (center then down)
 
-        # EQ CONTROLS EXTENDED - Deck B
-        'deck_b_eq_high': (MIDIChannel.AI_CONTROL.value, 50),
-        'deck_b_eq_mid': (MIDIChannel.AI_CONTROL.value, 51),
-        'deck_b_eq_low': (MIDIChannel.AI_CONTROL.value, 52),
+        # ===== BROWSER CONTROLS =====
+        # ✅ CONFIRMED WORKING
+        'browser_scroll_tracks': (MIDIChannel.AI_CONTROL.value, 37),  # ✅ Tested
+        'browser_scroll_tree': (MIDIChannel.AI_CONTROL.value, 55),    # ✅ Tested
+        'browser_open_artists': (MIDIChannel.AI_CONTROL.value, 59),   # ✅ Tested
 
-        # COMPATIBILITÀ LEGACY - Mantengo alcuni vecchi mapping
-        'deck_a_load_selected': (MIDIChannel.AI_CONTROL.value, 39),  # Alias per browser_load_deck_a
-        'deck_b_load_selected': (MIDIChannel.AI_CONTROL.value, 40),  # Alias per browser_load_deck_b
-        'browser_scroll_up': (MIDIChannel.AI_CONTROL.value, 37),     # Alias per browser_up
-        'browser_scroll_down': (MIDIChannel.AI_CONTROL.value, 38),   # Alias per browser_down
+        # ALIASES for compatibility
+        'browser_up': (MIDIChannel.AI_CONTROL.value, 37),    # ✅ Same as scroll_tracks
+        'browser_down': (MIDIChannel.AI_CONTROL.value, 38),  # ✅ Tested - scrolls track list
+
+        # ⚠️ CRITICAL - NOT YET MAPPED
+        'browser_load_deck_a': (MIDIChannel.AI_CONTROL.value, 43),  # ⚠️ Recommended CC 43
+        'browser_load_deck_b': (MIDIChannel.AI_CONTROL.value, 44),  # ⚠️ Recommended CC 44
+        'browser_select_item': (MIDIChannel.AI_CONTROL.value, 49),  # ⚠️ NOT TESTED
+
+        # ===== SYNC CONTROLS =====
+        # ⚠️ NOT YET MAPPED - Musical sync (different from grid sync)
+        'deck_a_sync': (MIDIChannel.AI_CONTROL.value, 54),  # ⚠️ Recommended CC 54
+        'deck_b_sync': (MIDIChannel.AI_CONTROL.value, 57),  # ⚠️ Recommended CC 57
+        'deck_c_sync': (MIDIChannel.AI_CONTROL.value, 64),  # ⚠️ Available CC
+        'deck_d_sync': (MIDIChannel.AI_CONTROL.value, 65),  # ⚠️ Available CC
+
+        # ===== PITCH CONTROLS (DUPLICATES REMOVED) =====
+        # Pitch controls already defined above - removed duplicates
+        'deck_c_pitch': (MIDIChannel.AI_CONTROL.value, 47),  # ⚠️ Available CC
+        'deck_d_pitch': (MIDIChannel.AI_CONTROL.value, 48),  # ⚠️ Available CC
+
+        # ===== LEGACY COMPATIBILITY ALIASES =====
+        # Keep for backward compatibility
+        'deck_a_load_selected': (MIDIChannel.AI_CONTROL.value, 43),  # Alias → browser_load_deck_a
+        'deck_b_load_selected': (MIDIChannel.AI_CONTROL.value, 44),  # Alias → browser_load_deck_b
+        'browser_scroll_up': (MIDIChannel.AI_CONTROL.value, 37),     # Alias → browser_up
+        'browser_scroll_down': (MIDIChannel.AI_CONTROL.value, 38),   # Alias → browser_down
 
         # Human Override (Channel 3) - Range alto per sicurezza
         'emergency_stop': (MIDIChannel.HUMAN_OVERRIDE.value, 80),
@@ -135,69 +164,80 @@ class TraktorController:
         # ADVANCED NAVIGATION & PERFORMANCE CONTROLS
         # ==========================================
 
-        # BROWSER TREE NAVIGATION (CC 55-64) - NUOVO
-        'browser_tree_up': (MIDIChannel.AI_CONTROL.value, 55),        # Scroll tree up
-        'browser_tree_down': (MIDIChannel.AI_CONTROL.value, 56),      # Scroll tree down
-        'browser_tree_enter': (MIDIChannel.AI_CONTROL.value, 57),     # Enter folder/playlist
-        'browser_tree_exit': (MIDIChannel.AI_CONTROL.value, 58),      # Exit to parent
-        'browser_tree_expand': (MIDIChannel.AI_CONTROL.value, 59),    # Expand folder
-        'browser_tree_collapse': (MIDIChannel.AI_CONTROL.value, 60),  # Collapse folder
+        # BROWSER TREE NAVIGATION - Updated to avoid conflicts
+        # Note: CC 55, 56, 59 are already mapped (verified)
+        'browser_tree_up': (MIDIChannel.AI_CONTROL.value, 55),        # ✅ Alias → browser_scroll_tree
+        'browser_tree_down': (MIDIChannel.AI_CONTROL.value, 56),      # ✅ Tested - scrolls tree
+        'browser_tree_enter': (MIDIChannel.AI_CONTROL.value, 66),     # ⚠️ Available CC
+        'browser_tree_exit': (MIDIChannel.AI_CONTROL.value, 67),      # ⚠️ Available CC
+        'browser_tree_expand': (MIDIChannel.AI_CONTROL.value, 59),    # ✅ Alias → browser_open_artists
+        'browser_tree_collapse': (MIDIChannel.AI_CONTROL.value, 68),  # ⚠️ Available CC
 
-        # BROWSER PAGE CONTROLS (CC 61-63) - NUOVO
-        'browser_page_up': (MIDIChannel.AI_CONTROL.value, 61),        # Page up in list
-        'browser_page_down': (MIDIChannel.AI_CONTROL.value, 62),      # Page down in list
-        'browser_top': (MIDIChannel.AI_CONTROL.value, 63),            # Jump to top
-        'browser_bottom': (MIDIChannel.AI_CONTROL.value, 64),         # Jump to bottom
+        # BROWSER PAGE CONTROLS - Available CCs
+        'browser_page_up': (MIDIChannel.AI_CONTROL.value, 69),        # ⚠️ Available CC
+        'browser_page_down': (MIDIChannel.AI_CONTROL.value, 70),      # ⚠️ Available CC
+        'browser_top': (MIDIChannel.AI_CONTROL.value, 71),            # ⚠️ Available CC
+        'browser_bottom': (MIDIChannel.AI_CONTROL.value, 72),         # ⚠️ Available CC
 
-        # LOOP CONTROLS DECK A (CC 70-75) - NUOVO
-        'deck_a_loop_in': (MIDIChannel.AI_CONTROL.value, 70),         # Set loop in point
-        'deck_a_loop_out': (MIDIChannel.AI_CONTROL.value, 71),        # Set loop out point
-        'deck_a_loop_active': (MIDIChannel.AI_CONTROL.value, 72),     # Activate/deactivate loop
-        'deck_a_loop_size': (MIDIChannel.AI_CONTROL.value, 73),       # Loop size control
+        # LOOP CONTROLS DECK A - Available CCs
+        'deck_a_loop_in': (MIDIChannel.AI_CONTROL.value, 45),         # ⚠️ Recommended CC 45
+        'deck_a_loop_out': (MIDIChannel.AI_CONTROL.value, 46),        # ⚠️ Recommended CC 46
+        'deck_a_loop_active': (MIDIChannel.AI_CONTROL.value, 73),     # ⚠️ Available CC
+        'deck_a_loop_size_half': (MIDIChannel.AI_CONTROL.value, 47),  # ⚠️ Recommended CC 47 (÷2)
+        'deck_a_loop_size_double': (MIDIChannel.AI_CONTROL.value, 48), # ⚠️ Recommended CC 48 (×2)
 
-        # LOOP CONTROLS DECK B (CC 74-77) - NUOVO
-        'deck_b_loop_in': (MIDIChannel.AI_CONTROL.value, 74),
-        'deck_b_loop_out': (MIDIChannel.AI_CONTROL.value, 75),
-        'deck_b_loop_active': (MIDIChannel.AI_CONTROL.value, 76),
-        'deck_b_loop_size': (MIDIChannel.AI_CONTROL.value, 77),
+        # LOOP CONTROLS DECK B - Available CCs
+        'deck_b_loop_in': (MIDIChannel.AI_CONTROL.value, 74),         # ⚠️ Available CC
+        'deck_b_loop_out': (MIDIChannel.AI_CONTROL.value, 75),        # ⚠️ Available CC
+        'deck_b_loop_active': (MIDIChannel.AI_CONTROL.value, 76),     # ⚠️ Available CC
+        'deck_b_loop_size_half': (MIDIChannel.AI_CONTROL.value, 77),  # ⚠️ Available CC
+        'deck_b_loop_size_double': (MIDIChannel.AI_CONTROL.value, 78), # ⚠️ Available CC
 
-        # HOTCUES DECK A (CC 80-87) - 8 hotcues - NUOVO
-        'deck_a_hotcue_1': (MIDIChannel.AI_CONTROL.value, 80),
-        'deck_a_hotcue_2': (MIDIChannel.AI_CONTROL.value, 81),
-        'deck_a_hotcue_3': (MIDIChannel.AI_CONTROL.value, 82),
-        'deck_a_hotcue_4': (MIDIChannel.AI_CONTROL.value, 83),
-        'deck_a_hotcue_5': (MIDIChannel.AI_CONTROL.value, 84),
-        'deck_a_hotcue_6': (MIDIChannel.AI_CONTROL.value, 85),
-        'deck_a_hotcue_7': (MIDIChannel.AI_CONTROL.value, 86),
-        'deck_a_hotcue_8': (MIDIChannel.AI_CONTROL.value, 87),
+        # ⚠️ MAP BUTTON CONTROLS - REDUNDANT MAPPINGS (verified)
+        # CC 80-87: All toggle MAP button Deck A (keep only CC 80 for actual use)
+        # CC 89-95: All toggle MAP button Deck B (keep only CC 89 for actual use)
+        'deck_a_map_toggle': (MIDIChannel.AI_CONTROL.value, 80),      # ✅ Tested - MAP button Deck A
+        'deck_b_map_toggle': (MIDIChannel.AI_CONTROL.value, 89),      # ✅ Tested - MAP button Deck B
 
-        # HOTCUES DECK B (CC 88-95) - 8 hotcues - NUOVO
-        'deck_b_hotcue_1': (MIDIChannel.AI_CONTROL.value, 88),
-        'deck_b_hotcue_2': (MIDIChannel.AI_CONTROL.value, 89),
-        'deck_b_hotcue_3': (MIDIChannel.AI_CONTROL.value, 90),
-        'deck_b_hotcue_4': (MIDIChannel.AI_CONTROL.value, 91),
-        'deck_b_hotcue_5': (MIDIChannel.AI_CONTROL.value, 92),
-        'deck_b_hotcue_6': (MIDIChannel.AI_CONTROL.value, 93),
-        'deck_b_hotcue_7': (MIDIChannel.AI_CONTROL.value, 94),
-        'deck_b_hotcue_8': (MIDIChannel.AI_CONTROL.value, 95),
+        # HOTCUES DECK A - Use available CCs (recommended: 1-8)
+        'deck_a_hotcue_1': (MIDIChannel.AI_CONTROL.value, 1),         # ⚠️ Recommended CC 1-8
+        'deck_a_hotcue_2': (MIDIChannel.AI_CONTROL.value, 2),
+        'deck_a_hotcue_3': (MIDIChannel.AI_CONTROL.value, 3),
+        'deck_a_hotcue_4': (MIDIChannel.AI_CONTROL.value, 4),
+        'deck_a_hotcue_5': (MIDIChannel.AI_CONTROL.value, 5),
+        'deck_a_hotcue_6': (MIDIChannel.AI_CONTROL.value, 6),
+        'deck_a_hotcue_7': (MIDIChannel.AI_CONTROL.value, 7),
+        'deck_a_hotcue_8': (MIDIChannel.AI_CONTROL.value, 8),
 
-        # BEATJUMP CONTROLS (CC 96-103) - NUOVO
-        'deck_a_beatjump_fwd_1': (MIDIChannel.AI_CONTROL.value, 96),  # +1 beat
-        'deck_a_beatjump_back_1': (MIDIChannel.AI_CONTROL.value, 97), # -1 beat
-        'deck_a_beatjump_fwd_4': (MIDIChannel.AI_CONTROL.value, 98),  # +4 beats
-        'deck_a_beatjump_back_4': (MIDIChannel.AI_CONTROL.value, 99), # -4 beats
-        'deck_b_beatjump_fwd_1': (MIDIChannel.AI_CONTROL.value, 104), # +1 beat
-        'deck_b_beatjump_back_1': (MIDIChannel.AI_CONTROL.value, 105),# -1 beat
-        'deck_b_beatjump_fwd_4': (MIDIChannel.AI_CONTROL.value, 106), # +4 beats
-        'deck_b_beatjump_back_4': (MIDIChannel.AI_CONTROL.value, 107),# -4 beats
+        # HOTCUES DECK B - Use available CCs (recommended: 9-16)
+        'deck_b_hotcue_1': (MIDIChannel.AI_CONTROL.value, 9),         # ⚠️ Recommended CC 9-16
+        'deck_b_hotcue_2': (MIDIChannel.AI_CONTROL.value, 10),
+        'deck_b_hotcue_3': (MIDIChannel.AI_CONTROL.value, 11),
+        'deck_b_hotcue_4': (MIDIChannel.AI_CONTROL.value, 12),
+        'deck_b_hotcue_5': (MIDIChannel.AI_CONTROL.value, 13),
+        'deck_b_hotcue_6': (MIDIChannel.AI_CONTROL.value, 14),
+        'deck_b_hotcue_7': (MIDIChannel.AI_CONTROL.value, 15),
+        'deck_b_hotcue_8': (MIDIChannel.AI_CONTROL.value, 16),
 
-        # ADVANCED DECK CONTROLS (CC 108-115) - NUOVO
-        'deck_a_keylock': (MIDIChannel.AI_CONTROL.value, 108),        # Key lock toggle
-        'deck_b_keylock': (MIDIChannel.AI_CONTROL.value, 109),
-        'deck_a_quantize': (MIDIChannel.AI_CONTROL.value, 110),       # Quantize toggle
-        'deck_b_quantize': (MIDIChannel.AI_CONTROL.value, 111),
-        'deck_a_flux': (MIDIChannel.AI_CONTROL.value, 112),           # Flux mode toggle
-        'deck_b_flux': (MIDIChannel.AI_CONTROL.value, 113),
+        # BEATJUMP CONTROLS - Use recommended available CCs
+        'deck_a_beatjump_fwd_1': (MIDIChannel.AI_CONTROL.value, 49),  # ⚠️ Recommended CC 49
+        'deck_a_beatjump_back_1': (MIDIChannel.AI_CONTROL.value, 53), # ⚠️ Recommended CC 53
+        'deck_a_beatjump_fwd_4': (MIDIChannel.AI_CONTROL.value, 96),  # ⚠️ Available CC
+        'deck_a_beatjump_back_4': (MIDIChannel.AI_CONTROL.value, 97), # ⚠️ Available CC
+        'deck_b_beatjump_fwd_1': (MIDIChannel.AI_CONTROL.value, 98),  # ⚠️ Available CC
+        'deck_b_beatjump_back_1': (MIDIChannel.AI_CONTROL.value, 99), # ⚠️ Available CC
+        'deck_b_beatjump_fwd_4': (MIDIChannel.AI_CONTROL.value, 100), # ⚠️ Available CC
+        'deck_b_beatjump_back_4': (MIDIChannel.AI_CONTROL.value, 101),# ⚠️ Available CC
+
+        # ADVANCED DECK CONTROLS - Available CCs
+        'deck_a_filter': (MIDIChannel.AI_CONTROL.value, 58),          # ⚠️ Recommended CC 58
+        'deck_b_filter': (MIDIChannel.AI_CONTROL.value, 61),          # ⚠️ Recommended CC 61
+        'deck_a_keylock': (MIDIChannel.AI_CONTROL.value, 102),        # ⚠️ Available CC
+        'deck_b_keylock': (MIDIChannel.AI_CONTROL.value, 103),        # ⚠️ Available CC
+        'deck_a_quantize': (MIDIChannel.AI_CONTROL.value, 104),       # ⚠️ Available CC
+        'deck_b_quantize': (MIDIChannel.AI_CONTROL.value, 105),       # ⚠️ Available CC
+        'deck_a_flux': (MIDIChannel.AI_CONTROL.value, 106),           # ⚠️ Available CC
+        'deck_b_flux': (MIDIChannel.AI_CONTROL.value, 107),           # ⚠️ Available CC
     }
 
     # Status feedback CC mappings (Channel 2 - INPUT da Traktor)

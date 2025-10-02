@@ -48,6 +48,9 @@ class DJInterface:
         self.traktor_controller: Optional[TraktorController] = None
         self.music_scanner: Optional[MusicLibraryScanner] = None
 
+        # NUOVO: MIDI Communication Monitor
+        self.midi_monitor: Optional[Any] = None  # Lazy import per evitare circular
+
         # Stato DJ
         self.dj_context = DJContext()
         self.ai_enabled = False
@@ -121,6 +124,9 @@ class DJInterface:
 
         # === MIDDLE: Status e Controlli DJ ===
         self._create_dj_controls(main_frame)
+
+        # === NUOVO: MIDI Communication Status ===
+        self._create_midi_status_panel(main_frame)
 
         # === BOTTOM: Chat AI e Log ===
         self._create_chat_section(main_frame)
@@ -514,8 +520,28 @@ class DJInterface:
             self._log_status("🎛️ Connessione Traktor...")
             self.traktor_controller = get_traktor_controller(self.config)
 
-            if not self.traktor_controller.connect():
-                raise Exception("Impossibile connettersi a Traktor")
+            connection_result = self.traktor_controller.connect()
+
+            # Log risultato connessione
+            if self.traktor_controller.simulation_mode:
+                self._log_status("⚠️ Traktor SIMULATION MODE attivo (MIDI non disponibile)")
+            elif connection_result:
+                self._log_status("✅ Traktor connesso via MIDI")
+            else:
+                self._log_status("❌ Connessione Traktor fallita")
+
+            # NUOVO: Inizializza MIDI Communication Monitor
+            self._log_status("📡 Inizializzazione MIDI monitor...")
+            from midi_communication_monitor import MIDICommunicationMonitor
+            self.midi_monitor = MIDICommunicationMonitor(self.traktor_controller)
+
+            # Setup callbacks per feedback GUI
+            self.midi_monitor.on_command_sent = self._on_midi_command_sent
+            self.midi_monitor.on_command_verified = self._on_midi_command_verified
+            self.midi_monitor.on_command_timeout = self._on_midi_command_timeout
+            self.midi_monitor.on_command_failed = self._on_midi_command_failed
+
+            self._log_status("✅ MIDI monitor attivo")
 
             # 3. Music scanner
             self._log_status("🎵 Scansione libreria musicale...")
@@ -1122,7 +1148,7 @@ AI Attivo: {'✅' if self.ai_enabled else '❌'}
             traceback.print_exc()
 
     def _execute_load_command(self, decision: Dict[str, Any]):
-        """Esegui solo comando load"""
+        """Esegui solo comando load con MIDI monitoring"""
         try:
             from traktor_control import DeckID
             deck_letter = decision["load_track"].upper()
@@ -1132,21 +1158,46 @@ AI Attivo: {'✅' if self.ai_enabled else '❌'}
                 deck = DeckID(deck_letter)
                 direction = decision.get("browse_direction", "down")
 
+                # NUOVO: Track comando con MIDI monitor
+                if self.midi_monitor:
+                    self.midi_monitor.track_command(
+                        command_name=f"Load Track",
+                        deck_id=deck_letter,
+                        expected_state="loaded=True",
+                        timeout=2.0
+                    )
+
                 self._log_status(f"🎵 Loading track to Deck {deck_letter} via MIDI...")
                 success = self.traktor_controller.load_next_track_smart(deck, direction)
 
                 if success:
-                    self._log_status(f"✅ Track loaded to Deck {deck_letter} successfully!")
-                    self._add_chat_message("Sistema", f"🎵 Traccia caricata nel Deck {deck_letter}")
+                    # Wait per Traktor processing
+                    time.sleep(0.5)
+
+                    # Verifica se track effettivamente caricata
+                    deck_state = self.traktor_controller.deck_states.get(deck, {})
+                    if deck_state.get('loaded'):
+                        if self.midi_monitor:
+                            self.midi_monitor.mark_verified()
+                        self._log_status(f"✅ Track loaded to Deck {deck_letter} successfully!")
+                        self._add_chat_message("Sistema", f"🎵 Traccia caricata nel Deck {deck_letter}")
+                    else:
+                        # Comando inviato ma verifica fallita
+                        self._log_status(f"⚠️ MIDI sent but track not loaded in Deck {deck_letter}")
+                        self._add_chat_message("Sistema", f"⚠️ Traccia non caricata (timeout)")
                 else:
+                    if self.midi_monitor:
+                        self.midi_monitor.mark_failed("MIDI send failed")
                     self._log_status(f"❌ Failed to load track to Deck {deck_letter}")
             else:
                 self._log_status(f"❌ Invalid deck letter: {deck_letter}")
         except Exception as e:
+            if self.midi_monitor:
+                self.midi_monitor.mark_failed(str(e))
             self._log_status(f"❌ Errore load command: {e}")
 
     def _execute_play_command(self, decision: Dict[str, Any]):
-        """Esegui solo comando play"""
+        """Esegui solo comando play con MIDI monitoring"""
         try:
             from traktor_control import DeckID
 
@@ -1164,13 +1215,35 @@ AI Attivo: {'✅' if self.ai_enabled else '❌'}
                         if not deck_state.get('loaded', True):  # Assume loaded if no state
                             self._log_status(f"⚠️ Warning: Deck {deck_letter} may not have a track loaded")
 
+                    # NUOVO: Track comando con MIDI monitor
+                    if self.midi_monitor:
+                        self.midi_monitor.track_command(
+                            command_name=f"Play Deck",
+                            deck_id=deck_letter,
+                            expected_state="playing=True",
+                            timeout=1.5
+                        )
+
                     self._log_status(f"▶️ Playing Deck {deck_letter} via MIDI...")
                     success = self.traktor_controller.play_deck(deck)
 
                     if success:
-                        self._log_status(f"✅ Deck {deck_letter} playing successfully!")
-                        self._add_chat_message("Sistema", f"▶️ Deck {deck_letter} sta suonando")
+                        # Wait per Traktor processing
+                        time.sleep(0.3)
+
+                        # Verifica se deck effettivamente playing
+                        deck_state = self.traktor_controller.deck_states.get(deck, {})
+                        if deck_state.get('playing'):
+                            if self.midi_monitor:
+                                self.midi_monitor.mark_verified()
+                            self._log_status(f"✅ Deck {deck_letter} playing successfully!")
+                            self._add_chat_message("Sistema", f"▶️ Deck {deck_letter} sta suonando")
+                        else:
+                            self._log_status(f"⚠️ MIDI sent but deck not playing")
+                            self._add_chat_message("Sistema", f"⚠️ Play non verificato")
                     else:
+                        if self.midi_monitor:
+                            self.midi_monitor.mark_failed("MIDI send failed")
                         self._log_status(f"❌ Failed to play Deck {deck_letter}")
                 else:
                     self._log_status(f"❌ Invalid deck letter: {deck_letter}")
@@ -1179,15 +1252,35 @@ AI Attivo: {'✅' if self.ai_enabled else '❌'}
             elif decision.get("play_track"):
                 self._log_status(f"▶️ AI wants to play current track (default Deck A)")
                 deck = DeckID.A  # Default deck
+
+                if self.midi_monitor:
+                    self.midi_monitor.track_command(
+                        command_name=f"Play Deck",
+                        deck_id="A",
+                        expected_state="playing=True",
+                        timeout=1.5
+                    )
+
                 success = self.traktor_controller.play_deck(deck)
 
                 if success:
-                    self._log_status(f"✅ Track playing successfully!")
-                    self._add_chat_message("Sistema", f"▶️ Traccia in riproduzione")
+                    time.sleep(0.3)
+                    deck_state = self.traktor_controller.deck_states.get(deck, {})
+                    if deck_state.get('playing'):
+                        if self.midi_monitor:
+                            self.midi_monitor.mark_verified()
+                        self._log_status(f"✅ Track playing successfully!")
+                        self._add_chat_message("Sistema", f"▶️ Traccia in riproduzione")
+                    else:
+                        self._log_status(f"⚠️ MIDI sent but not verified")
                 else:
+                    if self.midi_monitor:
+                        self.midi_monitor.mark_failed("MIDI send failed")
                     self._log_status(f"❌ Failed to play track")
 
         except Exception as e:
+            if self.midi_monitor:
+                self.midi_monitor.mark_failed(str(e))
             self._log_status(f"❌ Errore play command: {e}")
 
     def _execute_mixing_workflow(self, decision: Dict[str, Any]):
@@ -1365,6 +1458,159 @@ AI Attivo: {'✅' if self.ai_enabled else '❌'}
 
         self.root.quit()
         self.root.destroy()
+
+    # ========================================
+    # NUOVO: MIDI Communication Status Panel
+    # ========================================
+
+    def _create_midi_status_panel(self, parent):
+        """Crea panel status comunicazione MIDI"""
+        midi_frame = ttk.LabelFrame(parent, text="📡 MIDI Communication Status", padding=5)
+        midi_frame.pack(fill=tk.X, pady=(0, 10))
+
+        # Top row: Connection status
+        status_row = ttk.Frame(midi_frame)
+        status_row.pack(fill=tk.X, pady=2)
+
+        ttk.Label(status_row, text="Connection:").pack(side=tk.LEFT, padx=5)
+        self.midi_connection_var = tk.StringVar(value="⏸️ Not Connected")
+        self.midi_connection_label = ttk.Label(
+            status_row,
+            textvariable=self.midi_connection_var,
+            style='Status.TLabel'
+        )
+        self.midi_connection_label.pack(side=tk.LEFT, padx=5)
+
+        # Middle row: Last command
+        command_row = ttk.Frame(midi_frame)
+        command_row.pack(fill=tk.X, pady=2)
+
+        ttk.Label(command_row, text="Last Command:").pack(side=tk.LEFT, padx=5)
+        self.midi_last_command_var = tk.StringVar(value="-")
+        ttk.Label(command_row, textvariable=self.midi_last_command_var).pack(side=tk.LEFT, padx=5)
+
+        # Bottom row: Statistics
+        stats_row = ttk.Frame(midi_frame)
+        stats_row.pack(fill=tk.X, pady=2)
+
+        ttk.Label(stats_row, text="Stats:").pack(side=tk.LEFT, padx=5)
+        self.midi_stats_var = tk.StringVar(value="Sent: 0 | Verified: 0 | Timeout: 0 | Rate: 0%")
+        ttk.Label(stats_row, textvariable=self.midi_stats_var, font=('Courier', 8)).pack(side=tk.LEFT, padx=5)
+
+    # ========================================
+    # NUOVO: MIDI Monitor Callbacks
+    # ========================================
+
+    def _on_midi_command_sent(self, command_tracking):
+        """Callback quando comando MIDI inviato"""
+        try:
+            command_text = f"⏳ {command_tracking.command_name}"
+            if command_tracking.deck_id:
+                command_text += f" (Deck {command_tracking.deck_id})"
+
+            self.root.after(0, lambda: self.midi_last_command_var.set(command_text))
+            self.root.after(0, lambda: self.midi_connection_label.config(foreground='#ffaa00'))  # Yellow
+
+            # Start timeout check thread
+            threading.Thread(target=self._check_command_timeout, daemon=True).start()
+
+        except Exception as e:
+            logger.error(f"Error in _on_midi_command_sent callback: {e}")
+
+    def _on_midi_command_verified(self, command_tracking):
+        """Callback quando comando verificato"""
+        try:
+            command_text = f"✅ {command_tracking.command_name}"
+            if command_tracking.deck_id:
+                command_text += f" (Deck {command_tracking.deck_id})"
+
+            self.root.after(0, lambda: self.midi_last_command_var.set(command_text))
+            self.root.after(0, lambda: self.midi_connection_label.config(foreground='#00ff88'))  # Green
+
+            # Update stats
+            self._update_midi_stats()
+
+        except Exception as e:
+            logger.error(f"Error in _on_midi_command_verified callback: {e}")
+
+    def _on_midi_command_timeout(self, command_tracking):
+        """Callback quando comando in timeout"""
+        try:
+            command_text = f"⏱️ TIMEOUT: {command_tracking.command_name}"
+            if command_tracking.deck_id:
+                command_text += f" (Deck {command_tracking.deck_id})"
+
+            self.root.after(0, lambda: self.midi_last_command_var.set(command_text))
+            self.root.after(0, lambda: self.midi_connection_label.config(foreground='#ff4444'))  # Red
+
+            # Log warning
+            self._log_status(f"⏱️ Timeout: {command_tracking.command_name}")
+
+            # Update stats
+            self._update_midi_stats()
+
+        except Exception as e:
+            logger.error(f"Error in _on_midi_command_timeout callback: {e}")
+
+    def _on_midi_command_failed(self, command_tracking, error):
+        """Callback quando comando fallisce"""
+        try:
+            command_text = f"❌ FAILED: {command_tracking.command_name}"
+            if error:
+                command_text += f" ({error})"
+
+            self.root.after(0, lambda: self.midi_last_command_var.set(command_text))
+            self.root.after(0, lambda: self.midi_connection_label.config(foreground='#ff4444'))  # Red
+
+            # Log error
+            self._log_status(f"❌ Failed: {command_tracking.command_name} - {error}")
+
+            # Update stats
+            self._update_midi_stats()
+
+        except Exception as e:
+            logger.error(f"Error in _on_midi_command_failed callback: {e}")
+
+    def _check_command_timeout(self):
+        """Thread per check timeout comando"""
+        try:
+            if not self.midi_monitor:
+                return
+
+            # Wait e poi check timeout
+            time.sleep(0.5)  # Check ogni 0.5s per 2s
+
+            for _ in range(4):  # 4 checks = 2s total
+                if not self.midi_monitor.is_tracking():
+                    return  # Comando già completato
+
+                if self.midi_monitor.check_timeout():
+                    return  # Timeout rilevato
+
+                time.sleep(0.5)
+
+        except Exception as e:
+            logger.error(f"Error in timeout check thread: {e}")
+
+    def _update_midi_stats(self):
+        """Aggiorna statistiche MIDI display"""
+        try:
+            if not self.midi_monitor:
+                return
+
+            stats = self.midi_monitor.get_stats_summary()
+
+            stats_text = (
+                f"Sent: {stats['sent']} | "
+                f"Verified: {stats['verified']} | "
+                f"Timeout: {stats['timeout']} | "
+                f"Rate: {stats['success_rate']:.0f}%"
+            )
+
+            self.root.after(0, lambda: self.midi_stats_var.set(stats_text))
+
+        except Exception as e:
+            logger.error(f"Error updating MIDI stats: {e}")
 
     def run(self):
         """Avvia interfaccia"""

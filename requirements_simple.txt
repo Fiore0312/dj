@@ -13,6 +13,9 @@ requests>=2.32.0
 # Configuration Management
 pydantic-settings>=2.10.0
 
+# Claude Agent SDK - For autonomous AI DJ agent
+claude-agent-sdk>=0.1.0
+
 # Audio Analysis for Autonomous DJ (OPTIONAL - for advanced features)
 # Uncomment below to enable autonomous audio analysis:
 # librosa>=0.10.0

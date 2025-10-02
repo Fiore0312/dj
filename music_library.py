@@ -61,6 +61,10 @@ class TrackInfo:
     analyzed: bool = False
     compatible_bpm_range: Optional[Tuple[float, float]] = None
 
+    # Database timestamps
+    created_at: Optional[float] = None
+    updated_at: Optional[float] = None
+
     # Advanced audio analysis (from autonomous engine)
     audio_features: Optional[Any] = None  # AudioFeatures when available
     harmonic_key: Optional[str] = None

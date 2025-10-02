@@ -19,15 +19,18 @@ except ImportError:
     print("⚠️ python-rtmidi not available. Install with: pip install python-rtmidi")
     sys.exit(1)
 
-# Import from traktor_control
+# Import from traktor_control and config
 from traktor_control import TraktorController, MIDIChannel
+from config import DJConfig
 
 
 class InteractiveMIDITester:
     """Interactive tester for all MIDI commands"""
 
     def __init__(self):
-        self.traktor = TraktorController()
+        # Initialize config
+        self.config = DJConfig()
+        self.traktor = TraktorController(self.config)
         self.results = {
             "test_date": datetime.now().isoformat(),
             "total_commands": 0,

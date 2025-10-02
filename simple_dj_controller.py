@@ -59,6 +59,34 @@ class CommandType(Enum):
     # Macros
     BEATMATCH = "beatmatch"
 
+    # Browser Navigation (NEW)
+    TREE_UP = "tree_up"
+    TREE_DOWN = "tree_down"
+    TREE_ENTER = "tree_enter"
+    TREE_EXIT = "tree_exit"
+    TREE_EXPAND = "tree_expand"
+    TREE_COLLAPSE = "tree_collapse"
+    PAGE_UP = "page_up"
+    PAGE_DOWN = "page_down"
+
+    # Loop Controls (NEW)
+    LOOP_IN = "loop_in"
+    LOOP_OUT = "loop_out"
+    LOOP_ACTIVATE = "loop_activate"
+    LOOP_SIZE = "loop_size"
+
+    # Hotcue (NEW)
+    HOTCUE = "hotcue"
+    HOTCUE_DELETE = "hotcue_delete"
+
+    # Beatjump (NEW)
+    BEATJUMP = "beatjump"
+
+    # Advanced Deck (NEW)
+    KEYLOCK = "keylock"
+    QUANTIZE = "quantize"
+    FLUX = "flux"
+
     # Help
     HELP = "help"
     STATUS = "status"
@@ -173,6 +201,65 @@ class SimpleDJController:
 
             elif cmd_type == CommandType.BEATMATCH:
                 return await self._cmd_beatmatch(params)
+
+            # === NEW NAVIGATION COMMANDS ===
+            elif cmd_type == CommandType.TREE_UP:
+                return await self._cmd_tree_up(params)
+
+            elif cmd_type == CommandType.TREE_DOWN:
+                return await self._cmd_tree_down(params)
+
+            elif cmd_type == CommandType.TREE_ENTER:
+                return await self._cmd_tree_enter(params)
+
+            elif cmd_type == CommandType.TREE_EXIT:
+                return await self._cmd_tree_exit(params)
+
+            elif cmd_type == CommandType.TREE_EXPAND:
+                return await self._cmd_tree_expand(params)
+
+            elif cmd_type == CommandType.TREE_COLLAPSE:
+                return await self._cmd_tree_collapse(params)
+
+            elif cmd_type == CommandType.PAGE_UP:
+                return await self._cmd_page_up(params)
+
+            elif cmd_type == CommandType.PAGE_DOWN:
+                return await self._cmd_page_down(params)
+
+            # === LOOP CONTROLS ===
+            elif cmd_type == CommandType.LOOP_IN:
+                return await self._cmd_loop_in(params)
+
+            elif cmd_type == CommandType.LOOP_OUT:
+                return await self._cmd_loop_out(params)
+
+            elif cmd_type == CommandType.LOOP_ACTIVATE:
+                return await self._cmd_loop_activate(params)
+
+            elif cmd_type == CommandType.LOOP_SIZE:
+                return await self._cmd_loop_size(params)
+
+            # === HOTCUE ===
+            elif cmd_type == CommandType.HOTCUE:
+                return await self._cmd_hotcue(params)
+
+            elif cmd_type == CommandType.HOTCUE_DELETE:
+                return await self._cmd_hotcue_delete(params)
+
+            # === BEATJUMP ===
+            elif cmd_type == CommandType.BEATJUMP:
+                return await self._cmd_beatjump(params)
+
+            # === ADVANCED DECK CONTROLS ===
+            elif cmd_type == CommandType.KEYLOCK:
+                return await self._cmd_keylock(params)
+
+            elif cmd_type == CommandType.QUANTIZE:
+                return await self._cmd_quantize(params)
+
+            elif cmd_type == CommandType.FLUX:
+                return await self._cmd_flux(params)
 
             else:
                 return f"❌ Command not implemented: {cmd_type}"
@@ -289,6 +376,79 @@ class SimpleDJController:
             deck1, deck2 = self._extract_deck_transition(cmd)
             return CommandType.BEATMATCH, {"deck1": deck1, "deck2": deck2}
 
+        # === NEW NAVIGATION COMMANDS ===
+
+        # TREE NAVIGATION
+        if re.match(r"(tree|folder|playlist|cartella)", cmd):
+            if "up" in cmd or "su" in cmd or "sopra" in cmd:
+                return CommandType.TREE_UP, {}
+            elif "down" in cmd or "giù" in cmd or "sotto" in cmd:
+                return CommandType.TREE_DOWN, {}
+            elif "enter" in cmd or "entra" in cmd or "open" in cmd or "apri" in cmd:
+                return CommandType.TREE_ENTER, {}
+            elif "exit" in cmd or "esci" in cmd or "back" in cmd or "indietro" in cmd:
+                return CommandType.TREE_EXIT, {}
+            elif "expand" in cmd or "espandi" in cmd:
+                return CommandType.TREE_EXPAND, {}
+            elif "collapse" in cmd or "chiudi" in cmd:
+                return CommandType.TREE_COLLAPSE, {}
+
+        # PAGE NAVIGATION
+        if "page" in cmd or "pagina" in cmd:
+            if "up" in cmd or "su" in cmd:
+                return CommandType.PAGE_UP, {}
+            elif "down" in cmd or "giù" in cmd:
+                return CommandType.PAGE_DOWN, {}
+
+        # LOOP CONTROLS
+        if re.match(r"(loop)", cmd):
+            deck = self._extract_deck(cmd)
+            if "in" in cmd and "out" not in cmd:
+                return CommandType.LOOP_IN, {"deck": deck}
+            elif "out" in cmd:
+                return CommandType.LOOP_OUT, {"deck": deck}
+            elif "activate" in cmd or "attiva" in cmd or "on" in cmd:
+                return CommandType.LOOP_ACTIVATE, {"deck": deck, "active": True}
+            elif "deactivate" in cmd or "disattiva" in cmd or "off" in cmd:
+                return CommandType.LOOP_ACTIVATE, {"deck": deck, "active": False}
+            elif "toggle" in cmd:
+                return CommandType.LOOP_ACTIVATE, {"deck": deck, "active": None}  # Toggle
+            else:
+                # Check for loop size (e.g., "loop 4 beats", "loop 8")
+                size = self._extract_number(cmd, default=4)
+                return CommandType.LOOP_SIZE, {"deck": deck, "size": size}
+
+        # HOTCUE
+        if re.match(r"(hotcue|hot cue|cue)", cmd) and not re.match(r"^cue\s*$", cmd):
+            deck = self._extract_deck(cmd)
+            number = self._extract_hotcue_number(cmd)
+            if "delete" in cmd or "cancella" in cmd or "remove" in cmd:
+                return CommandType.HOTCUE_DELETE, {"deck": deck, "number": number}
+            else:
+                return CommandType.HOTCUE, {"deck": deck, "number": number}
+
+        # BEATJUMP
+        if re.match(r"(beatjump|beat jump|jump)", cmd):
+            deck = self._extract_deck(cmd)
+            direction, beats = self._extract_beatjump_params(cmd)
+            return CommandType.BEATJUMP, {"deck": deck, "direction": direction, "beats": beats}
+
+        # ADVANCED DECK CONTROLS
+        if "keylock" in cmd or "key lock" in cmd:
+            deck = self._extract_deck(cmd)
+            state = self._extract_toggle_state(cmd)
+            return CommandType.KEYLOCK, {"deck": deck, "state": state}
+
+        if "quantize" in cmd:
+            deck = self._extract_deck(cmd)
+            state = self._extract_toggle_state(cmd)
+            return CommandType.QUANTIZE, {"deck": deck, "state": state}
+
+        if "flux" in cmd:
+            deck = self._extract_deck(cmd)
+            state = self._extract_toggle_state(cmd)
+            return CommandType.FLUX, {"deck": deck, "state": state}
+
         return None, {}
 
     def _extract_deck(self, cmd: str) -> str:
@@ -380,6 +540,55 @@ class SimpleDJController:
 
         return genre, bpm_min, bpm_max
 
+    def _extract_hotcue_number(self, cmd: str) -> int:
+        """Extract hotcue number (1-8) from command"""
+        # Try to find number in command
+        match = re.search(r"(?:hotcue|cue|hot cue)\s*(\d+)", cmd)
+        if match:
+            number = int(match.group(1))
+            # Clamp to valid range
+            return max(1, min(8, number))
+
+        # Default to hotcue 1
+        return 1
+
+    def _extract_beatjump_params(self, cmd: str) -> Tuple[str, int]:
+        """Extract direction (forward/backward) and beat count (1/4) from beatjump command"""
+        # Default values
+        direction = "forward"
+        beats = 1
+
+        # Detect direction
+        if "back" in cmd or "indietro" in cmd or "backward" in cmd or "-" in cmd:
+            direction = "backward"
+        elif "forward" in cmd or "avanti" in cmd or "fwd" in cmd or "+" in cmd:
+            direction = "forward"
+
+        # Extract beat count (usually 1 or 4)
+        match = re.search(r"(\d+)\s*(?:beat|battute?)", cmd)
+        if match:
+            beats = int(match.group(1))
+        else:
+            # Check for just a number
+            match = re.search(r"\s(\d+)(?:\s|$)", cmd)
+            if match:
+                beats = int(match.group(1))
+
+        # Valid beat counts are typically 1 or 4
+        if beats not in [1, 4]:
+            beats = 1 if beats < 3 else 4
+
+        return direction, beats
+
+    def _extract_toggle_state(self, cmd: str) -> str:
+        """Extract on/off/toggle state for keylock/quantize/flux"""
+        if "on" in cmd or "attiva" in cmd or "enable" in cmd:
+            return "on"
+        elif "off" in cmd or "disattiva" in cmd or "disable" in cmd:
+            return "off"
+        else:
+            return "toggle"  # Default to toggle
+
     def _extract_eq_params(self, cmd: str) -> Tuple[str, float]:
         """Extract EQ band and level"""
         # Detect band
@@ -445,9 +654,16 @@ class SimpleDJController:
   pause [a|b]          - Pausa deck
   cue [a|b]            - Jump to cue point
 
-📂 CARICAMENTO:
+📂 CARICAMENTO & BROWSER:
   load [a|b]           - Carica traccia selezionata nel deck
-  browse up/down [N]   - Naviga browser (es: "browse down 5")
+  browse up/down [N]   - Naviga lista browser (es: "browse down 5")
+
+📁 NAVIGAZIONE TREE (NUOVO):
+  tree up/down         - Su/giù nell'albero playlist
+  tree enter           - Entra in cartella/playlist
+  tree exit            - Esci da cartella (torna indietro)
+  tree expand/collapse - Espandi/chiudi cartella
+  page up/down         - Pagina su/giù nel browser
 
 🎚️ MIXING:
   mix [a to b] [30s]   - Mix automatico tra deck (es: "mix a to b 20")
@@ -469,6 +685,25 @@ class SimpleDJController:
 🎵 PITCH/TEMPO:
   pitch [a|b] [±%]     - Regola pitch (es: "pitch a +2", "pitch b -1.5")
 
+🔁 LOOP CONTROLS (NUOVO):
+  loop in [a|b]        - Imposta punto IN del loop
+  loop out [a|b]       - Imposta punto OUT del loop
+  loop activate [a|b]  - Attiva loop
+  loop [4|8] [a|b]     - Imposta loop di N battute
+
+🎯 HOTCUES (NUOVO):
+  hotcue [1-8] [a|b]   - Triggera hotcue (es: "hotcue 3 a")
+  delete hotcue [1-8]  - Cancella hotcue
+
+⏭️ BEATJUMP (NUOVO):
+  beatjump forward [1|4] [a|b]  - Salta avanti N battute
+  beatjump back [1|4] [a|b]     - Salta indietro N battute
+
+🔧 CONTROLLI AVANZATI (NUOVO):
+  keylock [on|off] [a|b]  - Attiva/disattiva keylock
+  quantize [on|off] [a|b] - Attiva/disattiva quantize
+  flux [on|off] [a|b]     - Attiva/disattiva flux mode
+
 🚨 EMERGENCY:
   emergency stop       - Stop immediato tutti i deck
   panic                - Alias per emergency stop
@@ -485,17 +720,17 @@ class SimpleDJController:
 💡 ESEMPI BASE:
   play a               → Avvia deck A
   load b               → Carica traccia in deck B
+  tree enter           → Entra in playlist selezionata
+  tree down            → Scorri playlist verso il basso
   mix a to b 30        → Transizione da A a B in 30 secondi
-  search house 120-130 → Cerca house tra 120-130 BPM
-  browse down 5        → Scorri 5 tracce in giù
 
 💡 ESEMPI AVANZATI:
-  eq a bass 0          → Taglia i bassi su deck A
-  kill b high          → Kill acuti su deck B
-  fx 1 50%             → Attiva FX1 al 50%
-  pitch a +2           → Aumenta pitch deck A di +2%
-  beatmatch a b        → Sincronizza automaticamente A e B
-  emergency stop       → Stop di emergenza
+  loop in a            → Imposta inizio loop su deck A
+  loop 4 b             → Loop di 4 battute su deck B
+  hotcue 3 a           → Triggera hotcue 3 su deck A
+  beatjump back 4 b    → Salta indietro 4 battute su deck B
+  keylock on a         → Attiva keylock su deck A
+  tree exit            → Torna al livello superiore
 """
 
     async def _cmd_status(self) -> str:
@@ -834,6 +1069,163 @@ class SimpleDJController:
         result += "✅ Beatmatch complete!"
 
         return result
+
+    # === NEW NAVIGATION & ADVANCED COMMAND HANDLERS ===
+
+    async def _cmd_tree_up(self, params: Dict) -> str:
+        """Navigate up in browser tree"""
+        channel, cc = self.traktor.MIDI_MAP.get('browser_tree_up', (1, 55))
+        success = self.traktor._send_midi_command(channel, cc, 127, "Tree Up")
+        return "📁 ⬆️ Browser tree up" if success else "❌ Failed to navigate tree up"
+
+    async def _cmd_tree_down(self, params: Dict) -> str:
+        """Navigate down in browser tree"""
+        channel, cc = self.traktor.MIDI_MAP.get('browser_tree_down', (1, 56))
+        success = self.traktor._send_midi_command(channel, cc, 127, "Tree Down")
+        return "📁 ⬇️ Browser tree down" if success else "❌ Failed to navigate tree down"
+
+    async def _cmd_tree_enter(self, params: Dict) -> str:
+        """Enter folder/playlist in browser"""
+        channel, cc = self.traktor.MIDI_MAP.get('browser_tree_enter', (1, 57))
+        success = self.traktor._send_midi_command(channel, cc, 127, "Tree Enter")
+        return "📂 ➡️ Entered folder" if success else "❌ Failed to enter folder"
+
+    async def _cmd_tree_exit(self, params: Dict) -> str:
+        """Exit current folder/go back"""
+        channel, cc = self.traktor.MIDI_MAP.get('browser_tree_exit', (1, 58))
+        success = self.traktor._send_midi_command(channel, cc, 127, "Tree Exit")
+        return "📂 ⬅️ Exited folder" if success else "❌ Failed to exit folder"
+
+    async def _cmd_tree_expand(self, params: Dict) -> str:
+        """Expand folder in tree"""
+        channel, cc = self.traktor.MIDI_MAP.get('browser_tree_expand', (1, 59))
+        success = self.traktor._send_midi_command(channel, cc, 127, "Tree Expand")
+        return "📂 ⊞ Folder expanded" if success else "❌ Failed to expand folder"
+
+    async def _cmd_tree_collapse(self, params: Dict) -> str:
+        """Collapse folder in tree"""
+        channel, cc = self.traktor.MIDI_MAP.get('browser_tree_collapse', (1, 60))
+        success = self.traktor._send_midi_command(channel, cc, 127, "Tree Collapse")
+        return "📂 ⊟ Folder collapsed" if success else "❌ Failed to collapse folder"
+
+    async def _cmd_page_up(self, params: Dict) -> str:
+        """Page up in browser"""
+        channel, cc = self.traktor.MIDI_MAP.get('browser_page_up', (1, 61))
+        success = self.traktor._send_midi_command(channel, cc, 127, "Page Up")
+        return "📄 ⬆️ Page up" if success else "❌ Failed page up"
+
+    async def _cmd_page_down(self, params: Dict) -> str:
+        """Page down in browser"""
+        channel, cc = self.traktor.MIDI_MAP.get('browser_page_down', (1, 62))
+        success = self.traktor._send_midi_command(channel, cc, 127, "Page Down")
+        return "📄 ⬇️ Page down" if success else "❌ Failed page down"
+
+    async def _cmd_loop_in(self, params: Dict) -> str:
+        """Set loop in point"""
+        deck = params.get("deck", "A")
+        channel, cc = self.traktor.MIDI_MAP.get(f'deck_{deck.lower()}_loop_in', (1, 70))
+        success = self.traktor._send_midi_command(channel, cc, 127, f"Loop In {deck}")
+        return f"🔁 Deck {deck} loop IN set" if success else f"❌ Failed to set loop in on Deck {deck}"
+
+    async def _cmd_loop_out(self, params: Dict) -> str:
+        """Set loop out point"""
+        deck = params.get("deck", "A")
+        channel, cc = self.traktor.MIDI_MAP.get(f'deck_{deck.lower()}_loop_out', (1, 71))
+        success = self.traktor._send_midi_command(channel, cc, 127, f"Loop Out {deck}")
+        return f"🔁 Deck {deck} loop OUT set" if success else f"❌ Failed to set loop out on Deck {deck}"
+
+    async def _cmd_loop_activate(self, params: Dict) -> str:
+        """Activate/deactivate loop"""
+        deck = params.get("deck", "A")
+        active = params.get("active", True)
+        value = 127 if active else 0
+        channel, cc = self.traktor.MIDI_MAP.get(f'deck_{deck.lower()}_loop_active', (1, 72))
+        success = self.traktor._send_midi_command(channel, cc, value, f"Loop {'ON' if active else 'OFF'} {deck}")
+        status = "activated" if active else "deactivated"
+        return f"🔁 Deck {deck} loop {status}" if success else f"❌ Failed to {status} loop on Deck {deck}"
+
+    async def _cmd_loop_size(self, params: Dict) -> str:
+        """Set loop size"""
+        deck = params.get("deck", "A")
+        beats = params.get("beats", 4)
+        # Map beats to MIDI value (simplified: 4 beats = 64, 8 beats = 96, etc.)
+        midi_value = min(127, max(0, int(beats * 16)))
+        channel, cc = self.traktor.MIDI_MAP.get(f'deck_{deck.lower()}_loop_size', (1, 73))
+        success = self.traktor._send_midi_command(channel, cc, midi_value, f"Loop Size {deck}")
+        return f"🔁 Deck {deck} loop size: {beats} beats" if success else f"❌ Failed to set loop size on Deck {deck}"
+
+    async def _cmd_hotcue(self, params: Dict) -> str:
+        """Set/trigger hotcue"""
+        deck = params.get("deck", "A")
+        number = params.get("number", 1)
+        # CC 80-87 for deck A, 88-95 for deck B
+        base_cc = 80 if deck == "A" else 88
+        cc_num = base_cc + (number - 1)
+        channel, cc = self.traktor.MIDI_MAP.get(f'deck_{deck.lower()}_hotcue_{number}', (1, cc_num))
+        success = self.traktor._send_midi_command(channel, cc, 127, f"Hotcue {number} {deck}")
+        return f"🎯 Deck {deck} hotcue {number} triggered" if success else f"❌ Failed to trigger hotcue {number} on Deck {deck}"
+
+    async def _cmd_hotcue_delete(self, params: Dict) -> str:
+        """Delete hotcue"""
+        deck = params.get("deck", "A")
+        number = params.get("number", 1)
+        base_cc = 80 if deck == "A" else 88
+        cc_num = base_cc + (number - 1)
+        channel, cc = self.traktor.MIDI_MAP.get(f'deck_{deck.lower()}_hotcue_{number}', (1, cc_num))
+        # Send 0 to delete
+        success = self.traktor._send_midi_command(channel, cc, 0, f"Delete Hotcue {number} {deck}")
+        return f"🗑️ Deck {deck} hotcue {number} deleted" if success else f"❌ Failed to delete hotcue {number} on Deck {deck}"
+
+    async def _cmd_beatjump(self, params: Dict) -> str:
+        """Beatjump forward/backward"""
+        deck = params.get("deck", "A")
+        direction = params.get("direction", "forward")
+        beats = params.get("beats", 1)
+
+        # Determine CC based on deck, direction, and beat count
+        suffix = "fwd" if direction == "forward" else "back"
+        cc_key = f'deck_{deck.lower()}_beatjump_{suffix}_{beats}'
+
+        # Default CC values if not in map
+        default_cc = 96 if deck == "A" else 102
+        if direction == "backward":
+            default_cc += 1
+        if beats == 4:
+            default_cc += 2
+
+        channel, cc = self.traktor.MIDI_MAP.get(cc_key, (1, default_cc))
+        success = self.traktor._send_midi_command(channel, cc, 127, f"Beatjump {direction} {beats} {deck}")
+
+        arrow = "➡️" if direction == "forward" else "⬅️"
+        return f"⏭️ Deck {deck} beatjump {arrow} {beats} beat(s)" if success else f"❌ Failed beatjump on Deck {deck}"
+
+    async def _cmd_keylock(self, params: Dict) -> str:
+        """Toggle/set keylock"""
+        deck = params.get("deck", "A")
+        state = params.get("state", "toggle")
+        # Use 127 for on, 0 for off, 64 for toggle
+        value = 127 if state == "on" else (0 if state == "off" else 64)
+        channel, cc = self.traktor.MIDI_MAP.get(f'deck_{deck.lower()}_keylock', (1, 108))
+        success = self.traktor._send_midi_command(channel, cc, value, f"Keylock {state} {deck}")
+        return f"🔒 Deck {deck} keylock {state}" if success else f"❌ Failed to set keylock on Deck {deck}"
+
+    async def _cmd_quantize(self, params: Dict) -> str:
+        """Toggle/set quantize"""
+        deck = params.get("deck", "A")
+        state = params.get("state", "toggle")
+        value = 127 if state == "on" else (0 if state == "off" else 64)
+        channel, cc = self.traktor.MIDI_MAP.get(f'deck_{deck.lower()}_quantize', (1, 110))
+        success = self.traktor._send_midi_command(channel, cc, value, f"Quantize {state} {deck}")
+        return f"📐 Deck {deck} quantize {state}" if success else f"❌ Failed to set quantize on Deck {deck}"
+
+    async def _cmd_flux(self, params: Dict) -> str:
+        """Toggle/set flux mode"""
+        deck = params.get("deck", "A")
+        state = params.get("state", "toggle")
+        value = 127 if state == "on" else (0 if state == "off" else 64)
+        channel, cc = self.traktor.MIDI_MAP.get(f'deck_{deck.lower()}_flux', (1, 112))
+        success = self.traktor._send_midi_command(channel, cc, value, f"Flux {state} {deck}")
+        return f"🌊 Deck {deck} flux mode {state}" if success else f"❌ Failed to set flux on Deck {deck}"
 
     def print_help(self):
         """Print help at startup"""

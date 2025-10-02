@@ -130,6 +130,74 @@ class TraktorController:
         'fx2_drywet': (MIDIChannel.EFFECTS.value, 101),
         'fx3_drywet': (MIDIChannel.EFFECTS.value, 102),
         'fx4_drywet': (MIDIChannel.EFFECTS.value, 103),
+
+        # ==========================================
+        # ADVANCED NAVIGATION & PERFORMANCE CONTROLS
+        # ==========================================
+
+        # BROWSER TREE NAVIGATION (CC 55-64) - NUOVO
+        'browser_tree_up': (MIDIChannel.AI_CONTROL.value, 55),        # Scroll tree up
+        'browser_tree_down': (MIDIChannel.AI_CONTROL.value, 56),      # Scroll tree down
+        'browser_tree_enter': (MIDIChannel.AI_CONTROL.value, 57),     # Enter folder/playlist
+        'browser_tree_exit': (MIDIChannel.AI_CONTROL.value, 58),      # Exit to parent
+        'browser_tree_expand': (MIDIChannel.AI_CONTROL.value, 59),    # Expand folder
+        'browser_tree_collapse': (MIDIChannel.AI_CONTROL.value, 60),  # Collapse folder
+
+        # BROWSER PAGE CONTROLS (CC 61-63) - NUOVO
+        'browser_page_up': (MIDIChannel.AI_CONTROL.value, 61),        # Page up in list
+        'browser_page_down': (MIDIChannel.AI_CONTROL.value, 62),      # Page down in list
+        'browser_top': (MIDIChannel.AI_CONTROL.value, 63),            # Jump to top
+        'browser_bottom': (MIDIChannel.AI_CONTROL.value, 64),         # Jump to bottom
+
+        # LOOP CONTROLS DECK A (CC 70-75) - NUOVO
+        'deck_a_loop_in': (MIDIChannel.AI_CONTROL.value, 70),         # Set loop in point
+        'deck_a_loop_out': (MIDIChannel.AI_CONTROL.value, 71),        # Set loop out point
+        'deck_a_loop_active': (MIDIChannel.AI_CONTROL.value, 72),     # Activate/deactivate loop
+        'deck_a_loop_size': (MIDIChannel.AI_CONTROL.value, 73),       # Loop size control
+
+        # LOOP CONTROLS DECK B (CC 74-77) - NUOVO
+        'deck_b_loop_in': (MIDIChannel.AI_CONTROL.value, 74),
+        'deck_b_loop_out': (MIDIChannel.AI_CONTROL.value, 75),
+        'deck_b_loop_active': (MIDIChannel.AI_CONTROL.value, 76),
+        'deck_b_loop_size': (MIDIChannel.AI_CONTROL.value, 77),
+
+        # HOTCUES DECK A (CC 80-87) - 8 hotcues - NUOVO
+        'deck_a_hotcue_1': (MIDIChannel.AI_CONTROL.value, 80),
+        'deck_a_hotcue_2': (MIDIChannel.AI_CONTROL.value, 81),
+        'deck_a_hotcue_3': (MIDIChannel.AI_CONTROL.value, 82),
+        'deck_a_hotcue_4': (MIDIChannel.AI_CONTROL.value, 83),
+        'deck_a_hotcue_5': (MIDIChannel.AI_CONTROL.value, 84),
+        'deck_a_hotcue_6': (MIDIChannel.AI_CONTROL.value, 85),
+        'deck_a_hotcue_7': (MIDIChannel.AI_CONTROL.value, 86),
+        'deck_a_hotcue_8': (MIDIChannel.AI_CONTROL.value, 87),
+
+        # HOTCUES DECK B (CC 88-95) - 8 hotcues - NUOVO
+        'deck_b_hotcue_1': (MIDIChannel.AI_CONTROL.value, 88),
+        'deck_b_hotcue_2': (MIDIChannel.AI_CONTROL.value, 89),
+        'deck_b_hotcue_3': (MIDIChannel.AI_CONTROL.value, 90),
+        'deck_b_hotcue_4': (MIDIChannel.AI_CONTROL.value, 91),
+        'deck_b_hotcue_5': (MIDIChannel.AI_CONTROL.value, 92),
+        'deck_b_hotcue_6': (MIDIChannel.AI_CONTROL.value, 93),
+        'deck_b_hotcue_7': (MIDIChannel.AI_CONTROL.value, 94),
+        'deck_b_hotcue_8': (MIDIChannel.AI_CONTROL.value, 95),
+
+        # BEATJUMP CONTROLS (CC 96-103) - NUOVO
+        'deck_a_beatjump_fwd_1': (MIDIChannel.AI_CONTROL.value, 96),  # +1 beat
+        'deck_a_beatjump_back_1': (MIDIChannel.AI_CONTROL.value, 97), # -1 beat
+        'deck_a_beatjump_fwd_4': (MIDIChannel.AI_CONTROL.value, 98),  # +4 beats
+        'deck_a_beatjump_back_4': (MIDIChannel.AI_CONTROL.value, 99), # -4 beats
+        'deck_b_beatjump_fwd_1': (MIDIChannel.AI_CONTROL.value, 104), # +1 beat
+        'deck_b_beatjump_back_1': (MIDIChannel.AI_CONTROL.value, 105),# -1 beat
+        'deck_b_beatjump_fwd_4': (MIDIChannel.AI_CONTROL.value, 106), # +4 beats
+        'deck_b_beatjump_back_4': (MIDIChannel.AI_CONTROL.value, 107),# -4 beats
+
+        # ADVANCED DECK CONTROLS (CC 108-115) - NUOVO
+        'deck_a_keylock': (MIDIChannel.AI_CONTROL.value, 108),        # Key lock toggle
+        'deck_b_keylock': (MIDIChannel.AI_CONTROL.value, 109),
+        'deck_a_quantize': (MIDIChannel.AI_CONTROL.value, 110),       # Quantize toggle
+        'deck_b_quantize': (MIDIChannel.AI_CONTROL.value, 111),
+        'deck_a_flux': (MIDIChannel.AI_CONTROL.value, 112),           # Flux mode toggle
+        'deck_b_flux': (MIDIChannel.AI_CONTROL.value, 113),
     }
 
     # Status feedback CC mappings (Channel 2 - INPUT da Traktor)

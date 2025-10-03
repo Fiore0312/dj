@@ -61,36 +61,45 @@ class TraktorController:
     """Controller semplificato per Traktor"""
 
     # Mappatura MIDI CC - VERIFIED WORKING MAPPINGS
-    # Source: User discovery testing with test_cc_discovery.py
+    # Source: User discovery testing with test_cc_discovery.py + traktor-command-tester agent
     # Date: 2025-10-03
-    # Status: CONFIRMED on IAC Driver Bus 1, Channel 1
+    # Status: SYSTEMATICALLY TESTED on IAC Driver Bus 1, Channel 1
+    #
+    # CRITICAL DISCOVERIES via MIDI Learn Mode (2025-10-03):
+    # • CC 60 = deck_b_volume (was CC 29 conflict with pitch)
+    # • CC 80 = deck_a_cue (was CC 39 non-functional)
+    # • CC 81 = deck_b_cue (was CC 26 non-functional)
+    #
+    # REMAINING CONFLICTS:
+    # • CC 33 = master_volume activates limiter instead of volume
+    #
     # See: TRAKTOR_ACTUAL_CC_MAPPINGS.md for complete documentation
     MIDI_MAP = {
         # ===== TRANSPORT CONTROLS =====
         # ✅ CONFIRMED WORKING
         'deck_a_play': (MIDIChannel.AI_CONTROL.value, 20),  # ✅ Tested
         'deck_b_play': (MIDIChannel.AI_CONTROL.value, 21),  # ✅ Tested
-        'deck_a_cue': (MIDIChannel.AI_CONTROL.value, 39),   # ✅ Tested - Flash/blink
+        'deck_a_cue': (MIDIChannel.AI_CONTROL.value, 80),   # ✅ DISCOVERED via MIDI Learn 2025-10-03
         'deck_a_sync_grid': (MIDIChannel.AI_CONTROL.value, 24),  # ✅ Tested - Align to grid
         'deck_b_sync_grid': (MIDIChannel.AI_CONTROL.value, 25),  # ✅ Tested - Align to grid
 
         # NOT YET MAPPED - Use available CCs
-        'deck_c_play': (MIDIChannel.AI_CONTROL.value, 22),  # ⚠️ NOT TESTED
-        'deck_d_play': (MIDIChannel.AI_CONTROL.value, 23),  # ⚠️ NOT TESTED
-        'deck_b_cue': (MIDIChannel.AI_CONTROL.value, 26),   # ⚠️ NOT TESTED
-        'deck_c_cue': (MIDIChannel.AI_CONTROL.value, 27),   # ⚠️ NOT TESTED
-        'deck_d_cue': (MIDIChannel.AI_CONTROL.value, 88),   # ⚠️ NOT TESTED
+        'deck_c_play': (MIDIChannel.AI_CONTROL.value, 90),  # ✅ DISCOVERED via MIDI Learn 2025-10-03
+        'deck_d_play': (MIDIChannel.AI_CONTROL.value, 91),  # ✅ DISCOVERED via MIDI Learn 2025-10-03
+        'deck_b_cue': (MIDIChannel.AI_CONTROL.value, 81),   # ✅ DISCOVERED via MIDI Learn 2025-10-03
+        'deck_c_cue': (MIDIChannel.AI_CONTROL.value, 82),   # ✅ DISCOVERED via MIDI Learn 2025-10-03
+        'deck_d_cue': (MIDIChannel.AI_CONTROL.value, 83),   # ✅ DISCOVERED via MIDI Learn 2025-10-03
 
         # ===== VOLUME CONTROLS =====
         # ✅ CONFIRMED WORKING
         'deck_a_volume': (MIDIChannel.AI_CONTROL.value, 28),  # ✅ Tested
-        'deck_b_volume': (MIDIChannel.AI_CONTROL.value, 29),  # ⚠️ CONFLICT - also controls pitch!
+        'deck_b_volume': (MIDIChannel.AI_CONTROL.value, 60),  # ✅ DISCOVERED via MIDI Learn 2025-10-03 (was CC 29 conflict)
         'crossfader': (MIDIChannel.AI_CONTROL.value, 32),     # ✅ Tested (left/right/center)
-        'master_volume': (MIDIChannel.AI_CONTROL.value, 33),  # ✅ Tested
+        'master_volume': (MIDIChannel.AI_CONTROL.value, 33),  # ⚠️ CONFLICT - activates limiter instead of volume
 
         # NOT YET MAPPED
-        'deck_c_volume': (MIDIChannel.AI_CONTROL.value, 30),  # ⚠️ Available CC, not mapped
-        'deck_d_volume': (MIDIChannel.AI_CONTROL.value, 31),  # ⚠️ Available CC, not mapped
+        'deck_c_volume': (MIDIChannel.AI_CONTROL.value, 61),  # ✅ DISCOVERED via MIDI Learn 2025-10-03
+        'deck_d_volume': (MIDIChannel.AI_CONTROL.value, 62),  # ✅ DISCOVERED via MIDI Learn 2025-10-03
 
         # ===== EQ CONTROLS =====
         # ✅ CONFIRMED WORKING - Deck A
@@ -114,20 +123,27 @@ class TraktorController:
         'deck_b_pitch': (MIDIChannel.AI_CONTROL.value, 40),  # ✅ Tested (moves all the way down)
         # Note: CC 42 also controls Deck B pitch (center then down)
 
-        # ===== BROWSER CONTROLS =====
-        # ✅ CONFIRMED WORKING
+        # ===== BROWSER CONTROLS - COMPLETE NAVIGATION SYSTEM =====
+        # 🔍 BROWSER LIST NAVIGATION
         'browser_scroll_tracks': (MIDIChannel.AI_CONTROL.value, 37),  # ✅ Tested
-        'browser_scroll_tree': (MIDIChannel.AI_CONTROL.value, 55),    # ✅ Tested
-        'browser_open_artists': (MIDIChannel.AI_CONTROL.value, 59),   # ✅ Tested
-
-        # ALIASES for compatibility
+        'browser_select_up_down': (MIDIChannel.AI_CONTROL.value, 49), # ✅ DISCOVERED CC 49 - List Up/Down navigation 2025-10-03
         'browser_up': (MIDIChannel.AI_CONTROL.value, 37),    # ✅ Same as scroll_tracks
         'browser_down': (MIDIChannel.AI_CONTROL.value, 38),  # ✅ Tested - scrolls track list
 
-        # ⚠️ CRITICAL - NOT YET MAPPED
-        'browser_load_deck_a': (MIDIChannel.AI_CONTROL.value, 43),  # ⚠️ Recommended CC 43
-        'browser_load_deck_b': (MIDIChannel.AI_CONTROL.value, 44),  # ⚠️ Recommended CC 44
-        'browser_select_item': (MIDIChannel.AI_CONTROL.value, 49),  # ⚠️ NOT TESTED
+        # 🌳 BROWSER TREE NAVIGATION
+        'browser_scroll_tree': (MIDIChannel.AI_CONTROL.value, 55),    # ✅ Tested
+        'browser_tree_up_down': (MIDIChannel.AI_CONTROL.value, 56),   # ✅ DISCOVERED CC 56 - Tree navigation (Explorer/Music Folders) 2025-10-03
+        'browser_expand_collapse': (MIDIChannel.AI_CONTROL.value, 64), # ✅ DISCOVERED CC 64 - Expand/Collapse folders 2025-10-03
+        'browser_open_artists': (MIDIChannel.AI_CONTROL.value, 59),   # ✅ Tested
+
+        # 🎯 BROWSER LOADING - COMPLETE 4-DECK PATTERN
+        'browser_load_deck_a': (MIDIChannel.AI_CONTROL.value, 43),  # ✅ CONFIRMED via MIDI Learn 2025-10-03
+        'browser_load_deck_b': (MIDIChannel.AI_CONTROL.value, 44),  # ✅ CONFIRMED via MIDI Learn 2025-10-03
+        'browser_load_deck_c': (MIDIChannel.AI_CONTROL.value, 45),  # ✅ DISCOVERED CC 45 via MIDI Learn 2025-10-03
+        'browser_load_deck_d': (MIDIChannel.AI_CONTROL.value, 46),  # ✅ DISCOVERED CC 46 via MIDI Learn 2025-10-03
+
+        # LEGACY ALIASES for compatibility
+        'browser_select_item': (MIDIChannel.AI_CONTROL.value, 49),  # ✅ Same as browser_select_up_down
 
         # ===== SYNC CONTROLS =====
         # ⚠️ NOT YET MAPPED - Musical sync (different from grid sync)

@@ -1,0 +1,260 @@
+🎯 MANUAL TSI SETUP GUIDE - DJ AI CONTROLLER
+============================================================
+📅 Generated: 2025-09-29 11:50:27
+
+📋 SETUP INSTRUCTIONS:
+1. Open Traktor Pro 3
+2. Go to Preferences > Controller Manager
+3. Add > Generic MIDI
+4. Name: 'AI DJ Controller'
+5. In Device Setup:
+   - MIDI Input: IAC Driver Bus 1
+   - MIDI Output: IAC Driver Bus 1
+6. Click 'Add Out...' for each mapping below
+
+🎛️ EXACT MIDI MAPPINGS (Copy these exactly):
+------------------------------------------------------------
+
+1. Deck A Play:
+   Device: Generic MIDI
+   Channel: 1
+   Control: CC
+   No.: 20
+   Assignment: Deck A > Play/Pause
+   Type of Controller: Button
+   Interaction Mode: Toggle
+   MIDI Range: 0-127
+
+2. Deck B Play:
+   Device: Generic MIDI
+   Channel: 1
+   Control: CC
+   No.: 21
+   Assignment: Deck B > Play/Pause
+   Type of Controller: Button
+   Interaction Mode: Toggle
+   MIDI Range: 0-127
+
+3. Deck A Cue:
+   Device: Generic MIDI
+   Channel: 1
+   Control: CC
+   No.: 24
+   Assignment: Deck A > Cue
+   Type of Controller: Button
+   Interaction Mode: Hold
+   MIDI Range: 0-127
+
+4. Deck B Cue:
+   Device: Generic MIDI
+   Channel: 1
+   Control: CC
+   No.: 25
+   Assignment: Deck B > Cue
+   Type of Controller: Button
+   Interaction Mode: Hold
+   MIDI Range: 0-127
+
+5. Deck A Volume:
+   Device: Generic MIDI
+   Channel: 1
+   Control: CC
+   No.: 28
+   Assignment: Deck A > Volume
+   Type of Controller: Fader
+   Interaction Mode: Direct
+   MIDI Range: 0-127
+
+6. Deck B Volume:
+   Device: Generic MIDI
+   Channel: 1
+   Control: CC
+   No.: 29
+   Assignment: Deck B > Volume
+   Type of Controller: Fader
+   Interaction Mode: Direct
+   MIDI Range: 0-127
+
+7. Crossfader:
+   Device: Generic MIDI
+   Channel: 1
+   Control: CC
+   No.: 32
+   Assignment: Mixer > Crossfader
+   Type of Controller: Fader
+   Interaction Mode: Direct
+   MIDI Range: 0-127
+
+8. Master Volume:
+   Device: Generic MIDI
+   Channel: 1
+   Control: CC
+   No.: 33
+   Assignment: Mixer > Main
+   Type of Controller: Fader
+   Interaction Mode: Direct
+   MIDI Range: 0-127
+
+9. Deck A EQ High:
+   Device: Generic MIDI
+   Channel: 1
+   Control: CC
+   No.: 34
+   Assignment: Deck A > EQ > High
+   Type of Controller: Knob
+   Interaction Mode: Direct
+   MIDI Range: 0-127
+
+10. Deck A EQ Mid:
+   Device: Generic MIDI
+   Channel: 1
+   Control: CC
+   No.: 35
+   Assignment: Deck A > EQ > Mid
+   Type of Controller: Knob
+   Interaction Mode: Direct
+   MIDI Range: 0-127
+
+11. Deck A EQ Low:
+   Device: Generic MIDI
+   Channel: 1
+   Control: CC
+   No.: 36
+   Assignment: Deck A > EQ > Low
+   Type of Controller: Knob
+   Interaction Mode: Direct
+   MIDI Range: 0-127
+
+12. Browser Up:
+   Device: Generic MIDI
+   Channel: 1
+   Control: CC
+   No.: 37
+   Assignment: Browser > List Scroll Up
+   Type of Controller: Button
+   Interaction Mode: Inc
+   MIDI Range: 127-127
+
+13. Browser Down:
+   Device: Generic MIDI
+   Channel: 1
+   Control: CC
+   No.: 38
+   Assignment: Browser > List Scroll Down
+   Type of Controller: Button
+   Interaction Mode: Inc
+   MIDI Range: 127-127
+
+14. Load Deck A:
+   Device: Generic MIDI
+   Channel: 1
+   Control: CC
+   No.: 39
+   Assignment: Deck A > Load Selected
+   Type of Controller: Button
+   Interaction Mode: Trigger
+   MIDI Range: 127-127
+
+15. Load Deck B:
+   Device: Generic MIDI
+   Channel: 1
+   Control: CC
+   No.: 40
+   Assignment: Deck B > Load Selected
+   Type of Controller: Button
+   Interaction Mode: Trigger
+   MIDI Range: 127-127
+
+16. Browser Select:
+   Device: Generic MIDI
+   Channel: 1
+   Control: CC
+   No.: 49
+   Assignment: Browser > Tree Item Select
+   Type of Controller: Button
+   Interaction Mode: Trigger
+   MIDI Range: 127-127
+
+17. Deck A Sync:
+   Device: Generic MIDI
+   Channel: 1
+   Control: CC
+   No.: 41
+   Assignment: Deck A > Sync
+   Type of Controller: Button
+   Interaction Mode: Toggle
+   MIDI Range: 127-127
+
+18. Deck B Sync:
+   Device: Generic MIDI
+   Channel: 1
+   Control: CC
+   No.: 42
+   Assignment: Deck B > Sync
+   Type of Controller: Button
+   Interaction Mode: Toggle
+   MIDI Range: 127-127
+
+19. Deck A Tempo Bend:
+   Device: Generic MIDI
+   Channel: 1
+   Control: CC
+   No.: 45
+   Assignment: Deck A > Tempo Bend
+   Type of Controller: Fader
+   Interaction Mode: Direct
+   MIDI Range: 0-127
+
+20. Deck B Tempo Bend:
+   Device: Generic MIDI
+   Channel: 1
+   Control: CC
+   No.: 46
+   Assignment: Deck B > Tempo Bend
+   Type of Controller: Fader
+   Interaction Mode: Direct
+   MIDI Range: 0-127
+
+21. Deck B EQ High:
+   Device: Generic MIDI
+   Channel: 1
+   Control: CC
+   No.: 50
+   Assignment: Deck B > EQ > High
+   Type of Controller: Knob
+   Interaction Mode: Direct
+   MIDI Range: 0-127
+
+22. Deck B EQ Mid:
+   Device: Generic MIDI
+   Channel: 1
+   Control: CC
+   No.: 51
+   Assignment: Deck B > EQ > Mid
+   Type of Controller: Knob
+   Interaction Mode: Direct
+   MIDI Range: 0-127
+
+23. Deck B EQ Low:
+   Device: Generic MIDI
+   Channel: 1
+   Control: CC
+   No.: 52
+   Assignment: Deck B > EQ > Low
+   Type of Controller: Knob
+   Interaction Mode: Direct
+   MIDI Range: 0-127
+
+============================================================
+✅ VERIFICATION:
+After setup, test each control:
+- Play/Pause buttons should toggle playback
+- Volume faders should control deck volume
+- Browser controls should navigate music library
+- EQ knobs should adjust frequency bands
+- Load buttons should load selected tracks
+
+🆘 TROUBLESHOOTING:
+- If MIDI light flashes but no action: Check function assignment
+- If no MIDI light: Check IAC Driver Bus 1 is enabled
+- If wrong action: Verify CC numbers match exactly

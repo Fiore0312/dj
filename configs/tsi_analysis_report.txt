@@ -1,0 +1,73 @@
+🎯 TSI MAPPING ANALYSIS REPORT
+============================================================
+
+📊 SUMMARY:
+   Current mappings found: 2
+   Missing mappings: 33
+   Incorrect mappings: 0
+   Total corrections needed: 33
+
+❌ MISSING MAPPINGS:
+   • deck_a_play: Channel 1, CC 20 -> Deck A > Play/Pause
+   • deck_b_play: Channel 1, CC 21 -> Deck B > Play/Pause
+   • deck_c_play: Channel 1, CC 22 -> Unknown
+   • deck_d_play: Channel 1, CC 23 -> Unknown
+   • deck_a_cue: Channel 1, CC 24 -> Deck A > Cue
+   • deck_b_cue: Channel 1, CC 25 -> Deck B > Cue
+   • deck_c_cue: Channel 1, CC 26 -> Unknown
+   • deck_d_cue: Channel 1, CC 27 -> Unknown
+   • deck_a_volume: Channel 1, CC 28 -> Deck A > Volume
+   • deck_b_volume: Channel 1, CC 29 -> Deck B > Volume
+   • deck_c_volume: Channel 1, CC 30 -> Unknown
+   • deck_d_volume: Channel 1, CC 31 -> Unknown
+   • crossfader: Channel 1, CC 32 -> Mixer > Crossfader
+   • master_volume: Channel 1, CC 33 -> Mixer > Main
+   • deck_a_eq_high: Channel 1, CC 34 -> Deck A > EQ > High
+   • deck_a_eq_mid: Channel 1, CC 35 -> Deck A > EQ > Mid
+   • deck_a_eq_low: Channel 1, CC 36 -> Deck A > EQ > Low
+   • browser_up: Channel 1, CC 37 -> Browser > List Scroll Up
+   • browser_down: Channel 1, CC 38 -> Browser > List Scroll Down
+   • browser_load_deck_a: Channel 1, CC 39 -> Deck A > Load Selected
+   • browser_load_deck_b: Channel 1, CC 40 -> Deck B > Load Selected
+   • browser_select_item: Channel 1, CC 49 -> Browser > Tree Item Select
+   • deck_a_sync: Channel 1, CC 41 -> Deck A > Sync
+   • deck_b_sync: Channel 1, CC 42 -> Deck B > Sync
+   • deck_c_sync: Channel 1, CC 43 -> Unknown
+   • deck_d_sync: Channel 1, CC 44 -> Unknown
+   • deck_a_pitch: Channel 1, CC 45 -> Deck A > Tempo Bend
+   • deck_b_pitch: Channel 1, CC 46 -> Deck B > Tempo Bend
+   • deck_c_pitch: Channel 1, CC 47 -> Unknown
+   • deck_d_pitch: Channel 1, CC 48 -> Unknown
+   • deck_b_eq_high: Channel 1, CC 50 -> Deck B > EQ > High
+   • deck_b_eq_mid: Channel 1, CC 51 -> Deck B > EQ > Mid
+   • deck_b_eq_low: Channel 1, CC 52 -> Deck B > EQ > Low
+
+📋 CURRENT TSI MAPPINGS:
+   • Left.FX D/W Knob: Ch1, CC1 -> Deck A > Filter
+   • Right.FX D/W Knob: Ch1, CC2 -> Deck B > Filter
+
+✅ EXACT TRAKTOR MENU TERMINOLOGY:
+   Use these exact names when creating mappings in Traktor:
+   • Deck A > Play/Pause = Channel 1, CC 20
+   • Deck B > Play/Pause = Channel 1, CC 21
+   • Deck A > Cue = Channel 1, CC 24
+   • Deck B > Cue = Channel 1, CC 25
+   • Deck A > Volume = Channel 1, CC 28
+   • Deck B > Volume = Channel 1, CC 29
+   • Mixer > Crossfader = Channel 1, CC 32
+   • Mixer > Main = Channel 1, CC 33
+   • Deck A > EQ > High = Channel 1, CC 34
+   • Deck A > EQ > Mid = Channel 1, CC 35
+   • Deck A > EQ > Low = Channel 1, CC 36
+   • Deck B > EQ > High = Channel 1, CC 50
+   • Deck B > EQ > Mid = Channel 1, CC 51
+   • Deck B > EQ > Low = Channel 1, CC 52
+   • Browser > List Scroll Up = Channel 1, CC 37
+   • Browser > List Scroll Down = Channel 1, CC 38
+   • Deck A > Load Selected = Channel 1, CC 39
+   • Deck B > Load Selected = Channel 1, CC 40
+   • Browser > Tree Item Select = Channel 1, CC 49
+   • Deck A > Sync = Channel 1, CC 41
+   • Deck B > Sync = Channel 1, CC 42
+   • Deck A > Tempo Bend = Channel 1, CC 45
+   • Deck B > Tempo Bend = Channel 1, CC 46

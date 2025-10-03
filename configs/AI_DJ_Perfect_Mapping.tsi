@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<NIXML>
+  <TraktorSettings>
+    <Entry Name="DeviceIO.Config.Device" Type="1" Value="AI DJ Controller" />
+    <Entry Name="DeviceIO.Config.MidiIn.Device" Type="1" Value="IAC Driver Bus 1" />
+    <Entry Name="DeviceIO.Config.MidiOut.Device" Type="1" Value="IAC Driver Bus 1" />
+    <Entry Name="ControllerManager.Mapping.0" Type="4">
+      <Entry Name="Name" Type="1" Value="Deck A Play" />
+      <Entry Name="MidiChannel" Type="2" Value="1" />
+      <Entry Name="MidiCC" Type="2" Value="20" />
+      <Entry Name="TraktorFunction" Type="1" Value="Deck A &gt; Play/Pause" />
+      <Entry Name="ControlType" Type="1" Value="Button" />
+      <Entry Name="InteractionMode" Type="1" Value="Toggle" />
+      <Entry Name="MidiRange" Type="1" Value="0-127" />
+    </Entry>
+    <Entry Name="ControllerManager.Mapping.1" Type="4">
+      <Entry Name="Name" Type="1" Value="Deck B Play" />
+      <Entry Name="MidiChannel" Type="2" Value="1" />
+      <Entry Name="MidiCC" Type="2" Value="21" />
+      <Entry Name="TraktorFunction" Type="1" Value="Deck B &gt; Play/Pause" />
+      <Entry Name="ControlType" Type="1" Value="Button" />
+      <Entry Name="InteractionMode" Type="1" Value="Toggle" />
+      <Entry Name="MidiRange" Type="1" Value="0-127" />
+    </Entry>
+    <Entry Name="ControllerManager.Mapping.2" Type="4">
+      <Entry Name="Name" Type="1" Value="Deck A Cue" />
+      <Entry Name="MidiChannel" Type="2" Value="1" />
+      <Entry Name="MidiCC" Type="2" Value="24" />
+      <Entry Name="TraktorFunction" Type="1" Value="Deck A &gt; Cue" />
+      <Entry Name="ControlType" Type="1" Value="Button" />
+      <Entry Name="InteractionMode" Type="1" Value="Hold" />
+      <Entry Name="MidiRange" Type="1" Value="0-127" />
+    </Entry>
+    <Entry Name="ControllerManager.Mapping.3" Type="4">
+      <Entry Name="Name" Type="1" Value="Deck B Cue" />
+      <Entry Name="MidiChannel" Type="2" Value="1" />
+      <Entry Name="MidiCC" Type="2" Value="25" />
+      <Entry Name="TraktorFunction" Type="1" Value="Deck B &gt; Cue" />
+      <Entry Name="ControlType" Type="1" Value="Button" />
+      <Entry Name="InteractionMode" Type="1" Value="Hold" />
+      <Entry Name="MidiRange" Type="1" Value="0-127" />
+    </Entry>
+    <Entry Name="ControllerManager.Mapping.4" Type="4">
+      <Entry Name="Name" Type="1" Value="Deck A Volume" />
+      <Entry Name="MidiChannel" Type="2" Value="1" />
+      <Entry Name="MidiCC" Type="2" Value="28" />
+      <Entry Name="TraktorFunction" Type="1" Value="Deck A &gt; Volume" />
+      <Entry Name="ControlType" Type="1" Value="Fader" />
+      <Entry Name="InteractionMode" Type="1" Value="Direct" />
+      <Entry Name="MidiRange" Type="1" Value="0-127" />
+    </Entry>
+    <Entry Name="ControllerManager.Mapping.5" Type="4">
+      <Entry Name="Name" Type="1" Value="Deck B Volume" />
+      <Entry Name="MidiChannel" Type="2" Value="1" />
+      <Entry Name="MidiCC" Type="2" Value="29" />
+      <Entry Name="TraktorFunction" Type="1" Value="Deck B &gt; Volume" />
+      <Entry Name="ControlType" Type="1" Value="Fader" />
+      <Entry Name="InteractionMode" Type="1" Value="Direct" />
+      <Entry Name="MidiRange" Type="1" Value="0-127" />
+    </Entry>
+    <Entry Name="ControllerManager.Mapping.6" Type="4">
+      <Entry Name="Name" Type="1" Value="Crossfader" />
+      <Entry Name="MidiChannel" Type="2" Value="1" />
+      <Entry Name="MidiCC" Type="2" Value="32" />
+      <Entry Name="TraktorFunction" Type="1" Value="Mixer &gt; Crossfader" />
+      <Entry Name="ControlType" Type="1" Value="Fader" />
+      <Entry Name="InteractionMode" Type="1" Value="Direct" />
+      <Entry Name="MidiRange" Type="1" Value="0-127" />
+    </Entry>
+    <Entry Name="ControllerManager.Mapping.7" Type="4">
+      <Entry Name="Name" Type="1" Value="Master Volume" />
+      <Entry Name="MidiChannel" Type="2" Value="1" />
+      <Entry Name="MidiCC" Type="2" Value="33" />
+      <Entry Name="TraktorFunction" Type="1" Value="Mixer &gt; Main" />
+      <Entry Name="ControlType" Type="1" Value="Fader" />
+      <Entry Name="InteractionMode" Type="1" Value="Direct" />
+      <Entry Name="MidiRange" Type="1" Value="0-127" />
+    </Entry>
+    <Entry Name="ControllerManager.Mapping.8" Type="4">
+      <Entry Name="Name" Type="1" Value="Deck A EQ High" />
+      <Entry Name="MidiChannel" Type="2" Value="1" />
+      <Entry Name="MidiCC" Type="2" Value="34" />
+      <Entry Name="TraktorFunction" Type="1" Value="Deck A &gt; EQ &gt; High" />
+      <Entry Name="ControlType" Type="1" Value="Knob" />
+      <Entry Name="InteractionMode" Type="1" Value="Direct" />
+      <Entry Name="MidiRange" Type="1" Value="0-127" />
+    </Entry>
+    <Entry Name="ControllerManager.Mapping.9" Type="4">
+      <Entry Name="Name" Type="1" Value="Deck A EQ Mid" />
+      <Entry Name="MidiChannel" Type="2" Value="1" />
+      <Entry Name="MidiCC" Type="2" Value="35" />
+      <Entry Name="TraktorFunction" Type="1" Value="Deck A &gt; EQ &gt; Mid" />
+      <Entry Name="ControlType" Type="1" Value="Knob" />
+      <Entry Name="InteractionMode" Type="1" Value="Direct" />
+      <Entry Name="MidiRange" Type="1" Value="0-127" />
+    </Entry>
+    <Entry Name="ControllerManager.Mapping.10" Type="4">
+      <Entry Name="Name" Type="1" Value="Deck A EQ Low" />
+      <Entry Name="MidiChannel" Type="2" Value="1" />
+      <Entry Name="MidiCC" Type="2" Value="36" />
+      <Entry Name="TraktorFunction" Type="1" Value="Deck A &gt; EQ &gt; Low" />
+      <Entry Name="ControlType" Type="1" Value="Knob" />
+      <Entry Name="InteractionMode" Type="1" Value="Direct" />
+      <Entry Name="MidiRange" Type="1" Value="0-127" />
+    </Entry>
+    <Entry Name="ControllerManager.Mapping.11" Type="4">
+      <Entry Name="Name" Type="1" Value="Browser Up" />
+      <Entry Name="MidiChannel" Type="2" Value="1" />
+      <Entry Name="MidiCC" Type="2" Value="37" />
+      <Entry Name="TraktorFunction" Type="1" Value="Browser &gt; List Scroll Up" />
+      <Entry Name="ControlType" Type="1" Value="Button" />
+      <Entry Name="InteractionMode" Type="1" Value="Inc" />
+      <Entry Name="MidiRange" Type="1" Value="127-127" />
+    </Entry>
+    <Entry Name="ControllerManager.Mapping.12" Type="4">
+      <Entry Name="Name" Type="1" Value="Browser Down" />
+      <Entry Name="MidiChannel" Type="2" Value="1" />
+      <Entry Name="MidiCC" Type="2" Value="38" />
+      <Entry Name="TraktorFunction" Type="1" Value="Browser &gt; List Scroll Down" />
+      <Entry Name="ControlType" Type="1" Value="Button" />
+      <Entry Name="InteractionMode" Type="1" Value="Inc" />
+      <Entry Name="MidiRange" Type="1" Value="127-127" />
+    </Entry>
+    <Entry Name="ControllerManager.Mapping.13" Type="4">
+      <Entry Name="Name" Type="1" Value="Load Deck A" />
+      <Entry Name="MidiChannel" Type="2" Value="1" />
+      <Entry Name="MidiCC" Type="2" Value="39" />
+      <Entry Name="TraktorFunction" Type="1" Value="Deck A &gt; Load Selected" />
+      <Entry Name="ControlType" Type="1" Value="Button" />
+      <Entry Name="InteractionMode" Type="1" Value="Trigger" />
+      <Entry Name="MidiRange" Type="1" Value="127-127" />
+    </Entry>
+    <Entry Name="ControllerManager.Mapping.14" Type="4">
+      <Entry Name="Name" Type="1" Value="Load Deck B" />
+      <Entry Name="MidiChannel" Type="2" Value="1" />
+      <Entry Name="MidiCC" Type="2" Value="40" />
+      <Entry Name="TraktorFunction" Type="1" Value="Deck B &gt; Load Selected" />
+      <Entry Name="ControlType" Type="1" Value="Button" />
+      <Entry Name="InteractionMode" Type="1" Value="Trigger" />
+      <Entry Name="MidiRange" Type="1" Value="127-127" />
+    </Entry>
+    <Entry Name="ControllerManager.Mapping.15" Type="4">
+      <Entry Name="Name" Type="1" Value="Browser Select" />
+      <Entry Name="MidiChannel" Type="2" Value="1" />
+      <Entry Name="MidiCC" Type="2" Value="49" />
+      <Entry Name="TraktorFunction" Type="1" Value="Browser &gt; Tree Item Select" />
+      <Entry Name="ControlType" Type="1" Value="Button" />
+      <Entry Name="InteractionMode" Type="1" Value="Trigger" />
+      <Entry Name="MidiRange" Type="1" Value="127-127" />
+    </Entry>
+    <Entry Name="ControllerManager.Mapping.16" Type="4">
+      <Entry Name="Name" Type="1" Value="Deck A Sync" />
+      <Entry Name="MidiChannel" Type="2" Value="1" />
+      <Entry Name="MidiCC" Type="2" Value="41" />
+      <Entry Name="TraktorFunction" Type="1" Value="Deck A &gt; Sync" />
+      <Entry Name="ControlType" Type="1" Value="Button" />
+      <Entry Name="InteractionMode" Type="1" Value="Toggle" />
+      <Entry Name="MidiRange" Type="1" Value="127-127" />
+    </Entry>
+    <Entry Name="ControllerManager.Mapping.17" Type="4">
+      <Entry Name="Name" Type="1" Value="Deck B Sync" />
+      <Entry Name="MidiChannel" Type="2" Value="1" />
+      <Entry Name="MidiCC" Type="2" Value="42" />
+      <Entry Name="TraktorFunction" Type="1" Value="Deck B &gt; Sync" />
+      <Entry Name="ControlType" Type="1" Value="Button" />
+      <Entry Name="InteractionMode" Type="1" Value="Toggle" />
+      <Entry Name="MidiRange" Type="1" Value="127-127" />
+    </Entry>
+    <Entry Name="ControllerManager.Mapping.18" Type="4">
+      <Entry Name="Name" Type="1" Value="Deck A Tempo Bend" />
+      <Entry Name="MidiChannel" Type="2" Value="1" />
+      <Entry Name="MidiCC" Type="2" Value="45" />
+      <Entry Name="TraktorFunction" Type="1" Value="Deck A &gt; Tempo Bend" />
+      <Entry Name="ControlType" Type="1" Value="Fader" />
+      <Entry Name="InteractionMode" Type="1" Value="Direct" />
+      <Entry Name="MidiRange" Type="1" Value="0-127" />
+    </Entry>
+    <Entry Name="ControllerManager.Mapping.19" Type="4">
+      <Entry Name="Name" Type="1" Value="Deck B Tempo Bend" />
+      <Entry Name="MidiChannel" Type="2" Value="1" />
+      <Entry Name="MidiCC" Type="2" Value="46" />
+      <Entry Name="TraktorFunction" Type="1" Value="Deck B &gt; Tempo Bend" />
+      <Entry Name="ControlType" Type="1" Value="Fader" />
+      <Entry Name="InteractionMode" Type="1" Value="Direct" />
+      <Entry Name="MidiRange" Type="1" Value="0-127" />
+    </Entry>
+    <Entry Name="ControllerManager.Mapping.20" Type="4">
+      <Entry Name="Name" Type="1" Value="Deck B EQ High" />
+      <Entry Name="MidiChannel" Type="2" Value="1" />
+      <Entry Name="MidiCC" Type="2" Value="50" />
+      <Entry Name="TraktorFunction" Type="1" Value="Deck B &gt; EQ &gt; High" />
+      <Entry Name="ControlType" Type="1" Value="Knob" />
+      <Entry Name="InteractionMode" Type="1" Value="Direct" />
+      <Entry Name="MidiRange" Type="1" Value="0-127" />
+    </Entry>
+    <Entry Name="ControllerManager.Mapping.21" Type="4">
+      <Entry Name="Name" Type="1" Value="Deck B EQ Mid" />
+      <Entry Name="MidiChannel" Type="2" Value="1" />
+      <Entry Name="MidiCC" Type="2" Value="51" />
+      <Entry Name="TraktorFunction" Type="1" Value="Deck B &gt; EQ &gt; Mid" />
+      <Entry Name="ControlType" Type="1" Value="Knob" />
+      <Entry Name="InteractionMode" Type="1" Value="Direct" />
+      <Entry Name="MidiRange" Type="1" Value="0-127" />
+    </Entry>
+    <Entry Name="ControllerManager.Mapping.22" Type="4">
+      <Entry Name="Name" Type="1" Value="Deck B EQ Low" />
+      <Entry Name="MidiChannel" Type="2" Value="1" />
+      <Entry Name="MidiCC" Type="2" Value="52" />
+      <Entry Name="TraktorFunction" Type="1" Value="Deck B &gt; EQ &gt; Low" />
+      <Entry Name="ControlType" Type="1" Value="Knob" />
+      <Entry Name="InteractionMode" Type="1" Value="Direct" />
+      <Entry Name="MidiRange" Type="1" Value="0-127" />
+    </Entry>
+  </TraktorSettings>
+</NIXML>

@@ -1,0 +1,129 @@
+CC DISCOVERY RESULTS
+============================================================
+
+CC 1: nulla
+CC 2: nulla
+CC 3: nulla
+CC 4: nulla
+CC 5: nulla
+CC 6: nulla
+CC 7: nulla
+CC 8: nulla
+CC 9: nunulla
+CC 10: nulla
+CC 11: nulla
+CC 12: nulla
+CC 13: nnulla
+CC 14: nulla
+CC 15: nulla
+CC 16: nulla
+CC 17: nulla
+CC 18: nulla
+CC 19: nulla
+CC 20: è partita la traccia nel deck A
+CC 21: è partita la traccia nel deck B
+CC 22: nulla
+CC 23: nulla
+CC 24: ha allineato la traccia nel deck A alla prima riga della griglia più vicina
+CC 25: ha allineato la traccia nel deck B alla prima riga della griglia più vicina
+CC 26: nulla
+CC 27: nulla
+CC 29: qui c'è un errore da rsiolvere, si muove sia il volume del deck B sia il pitch control del deck B
+CC 30: nulla
+CC 31: nulla
+CC 32: si è spostato il corss-fader a destra, a sinistra e poi si è posizionato al centro
+CC 33: si è mosso il volume master
+CC 34: si è mosso il potenziometro dei controlli HIGH del deck A
+CC 35: si è mosso il potenziometro dei controlli MID nel deck A
+CC 36: si è mosso il potenziometro dei controlli LOW del deck A
+CC 37: scrolla la lista dei brani attuale
+CC 38: si è mossa la lista dei brani
+CC 39: ha lampeggiato la traccia nel deck A
+CC 40: si è spostato il pitch control del deck B tutto in basso
+CC 41: si è mosso il pitch control del deck A
+CC 42: si è mosso al centro e poi ancora in basso il pitch control del deck B
+CC 43: nulla
+CC 44: nulla
+CC 45: nulla
+CC 46: nulla
+CC 47: nulla
+CC 48: nulla
+CC 49: nulla
+CC 50: si è mosso il potenziometro HIGH del deck B
+CC 51: si è mosso il potenzionamentro MID del deck B
+CC 52: si è moswso il potenziometro LOW del deck B
+CC 53: nulla
+CC 54: nulla
+CC 55: scrolla l'albero della track collection
+CC 56: anche in quesrto caso scrolla l'albero della track collection
+CC 57: nulla
+CC 58: nulla
+CC 59: apre la cartella artists nella track collection
+CC 60: fa la stessa cosa
+CC 61: nulla
+CC 62: nulla
+CC 63: nulla
+CC 64: nulla
+CC 65: nullanulla
+CC 66: nulla
+CC 67: nulla
+CC 68: nulla
+CC 69: nulla
+CC 70: nulla
+CC 71: nulla
+CC 72: nulla
+CC 73: nulla
+CC 74: nulla
+CC 75: nulla
+CC 76: nulla
+CC 77: nulla
+CC 78: nulla
+CC 79: nulla
+CC 80: accende e spegne il tasto MAP nel deck A
+CC 81: accende e spegne il tasto MAP nel deck A
+CC 82: accende e spegne il tasto MAP nel deck A
+CC 83: accende e spegne il tasto MAP nel deck A
+CC 84: aaccende e spegne il tasto MAP nel deck A
+CC 85: accende e spegne il tasto MAP nel deck A
+CC 86: accende e spegne il tasto MAP nel deck A  accende e spegne il tasto MAP nel deck A
+CC 87: accende e spegne il tasto MAP nel deck A
+CC 88: NULLA
+CC 89: accende e spegne il tasto MAP nel deck B
+CC 90: accende e spegne il tasto MAP nel deck B
+CC 91: accende e spegne il tasto MAP nel deck B
+CC 92: accende e spegne il tasto MAP nel deck B
+CC 93: accende e spegne il tasto MAP nel deck B
+CC 94: accende e spegne il tasto MAP nel deck B
+CC 95: accende e spegne il tasto MAP nel deck B
+CC 96: nulla
+CC 97: nulla
+CC 98: nulla
+CC 99: nulla
+CC 100: nulla
+CC 101: nulla
+CC 102: nulla
+CC 103: nulla
+CC 104: nulla
+CC 105: nulla
+CC 106: nulla
+CC 107: nulla
+CC 108: nulla
+CC 109: nulla
+CC 110: nulla
+CC 111: nulla
+CC 112: nulla
+CC 113: nulla
+CC 114: nulla
+CC 115: nulla
+CC 116: nulla
+CC 117: nulla
+CC 118: nulla
+CC 119: nulla
+CC 120: nulla
+CC 121: nulla
+CC 122: nulla
+CC 123: nulla
+CC 124: nulla
+CC 125: nulla
+CC 126: nulla
+CC 127: nulla

@@ -1,0 +1,39 @@
+# DJ AI System - Dipendenze Essenziali
+
+# MIDI Communication
+python-rtmidi>=1.4.9
+mido>=1.2.10
+
+# Music Metadata
+mutagen>=1.46.0
+
+# HTTP Client (OpenRouter) - Sync version for tkinter compatibility
+requests>=2.32.0
+
+# Configuration Management
+pydantic-settings>=2.10.0
+
+# Claude Agent SDK - For autonomous AI DJ agent
+claude-agent-sdk>=0.1.0
+
+# Audio Analysis for Autonomous DJ (OPTIONAL - for advanced features)
+# Uncomment below to enable autonomous audio analysis:
+# librosa>=0.10.0
+# essentia-tensorflow>=2.1b6
+# scipy>=1.9.0
+# numpy>=1.21.0
+# scikit-learn>=1.1.0
+# sounddevice>=0.4.5
+
+# Note: These dependencies are LARGE (>150MB) and optional
+# The main DJ system works perfectly without them
+# To install: pip install librosa essentia-tensorflow scikit-learn sounddevice
+
+# GUI is built-in with tkinter (included in Python)
+# Async is built-in with asyncio (included in Python 3.7+)
+# JSON, pathlib, threading are built-in
+
+# Development (optional)
+# pytest>=7.0.0
+# black>=22.0.0
+# flake8>=4.0.0

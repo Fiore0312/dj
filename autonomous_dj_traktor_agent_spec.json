@@ -1,0 +1,74 @@
+{
+  "name": "autonomous-dj-traktor",
+  "description": "Use this agent when you need an autonomous DJ that can mix tracks using Traktor software, make real-time decisions based on feedback, and maintain musical coherence. Examples: When user wants DJ agent to start an evening set for a house party, when user provides real-time feedback during a DJ set, when user wants the DJ to operate completely autonomously for an event.",
+  "expertise": [
+    "Professional autonomous DJ operations",
+    "Music mixing and beatmatching",
+    "Crowd reading and energy management",
+    "Real-time decision making",
+    "Traktor software operation with precision",
+    "Intelligent track selection and mixing",
+    "Musical coherence maintenance",
+    "Professional DJ techniques"
+  ],
+  "capabilities": [
+    "Autonomous track selection based on venue and crowd",
+    "Real-time mixing with professional transitions",
+    "BPM matching and harmonic mixing",
+    "Energy progression management",
+    "Crowd feedback integration",
+    "Natural language command processing",
+    "Emergency override and manual control",
+    "Professional DJ workflow automation"
+  ],
+  "tools": [
+    "load_track_to_deck",
+    "play_deck",
+    "stop_deck",
+    "set_crossfader",
+    "set_deck_volume",
+    "sync_deck",
+    "browse_tracks",
+    "search_music_library",
+    "get_compatible_tracks",
+    "get_traktor_status",
+    "professional_mix_transition"
+  ],
+  "requirements": {
+    "software": [
+      "Traktor Pro 3",
+      "macOS with IAC Driver",
+      "Python 3.8+",
+      "Claude Agent SDK"
+    ],
+    "hardware": [
+      "MIDI interface (IAC Driver Bus 1)",
+      "Audio interface for output"
+    ],
+    "setup": [
+      "Import traktor/AI_DJ_Complete.tsi mapping",
+      "Enable IAC Driver in Audio MIDI Setup",
+      "Configure music library path",
+      "Set Anthropic API key"
+    ]
+  },
+  "usage_examples": [
+    {
+      "scenario": "House party evening set",
+      "command": "Start an evening set for a house party with progressive house around 120-125 BPM",
+      "behavior": "Agent selects warm-up tracks, gradually increases energy, maintains crowd engagement"
+    },
+    {
+      "scenario": "Real-time feedback integration",
+      "command": "The crowd seems to want more energy, play something more upbeat",
+      "behavior": "Agent analyzes current track, finds higher energy compatible track, executes smooth transition"
+    },
+    {
+      "scenario": "Fully autonomous operation",
+      "command": "auto",
+      "behavior": "Agent operates completely independently, selecting tracks, mixing, maintaining energy flow for specified duration"
+    }
+  ],
+  "entry_point": "/Users/Fiore/dj/autonomous_dj_traktor_agent.py",
+  "documentation": "/Users/Fiore/dj/docs/AUTONOMOUS_DJ_SDK_GUIDE.md"
+}

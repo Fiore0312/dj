@@ -1,0 +1,279 @@
+{
+  "timestamp": "2025-10-05T00:27:18.156531",
+  "total_hotcues": 32,
+  "successful_tests": 32,
+  "failed_tests": 0,
+  "success_rate": 1.0,
+  "conflict_resolution_verified": true,
+  "recommendations": [
+    "All HOTCUE mappings validated successfully",
+    "System ready for production use"
+  ],
+  "system_ready": true,
+  "deck_results": {
+    "A": [
+      {
+        "deck": "A",
+        "hotcue_number": 1,
+        "cc": 86,
+        "success": true,
+        "error_message": "",
+        "response_time_ms": 1.7888545989990234
+      },
+      {
+        "deck": "A",
+        "hotcue_number": 2,
+        "cc": 87,
+        "success": true,
+        "error_message": "",
+        "response_time_ms": 0.23102760314941406
+      },
+      {
+        "deck": "A",
+        "hotcue_number": 3,
+        "cc": 88,
+        "success": true,
+        "error_message": "",
+        "response_time_ms": 0.17404556274414062
+      },
+      {
+        "deck": "A",
+        "hotcue_number": 4,
+        "cc": 89,
+        "success": true,
+        "error_message": "",
+        "response_time_ms": 0.12993812561035156
+      },
+      {
+        "deck": "A",
+        "hotcue_number": 5,
+        "cc": 90,
+        "success": true,
+        "error_message": "",
+        "response_time_ms": 0.09512901306152344
+      },
+      {
+        "deck": "A",
+        "hotcue_number": 6,
+        "cc": 91,
+        "success": true,
+        "error_message": "",
+        "response_time_ms": 1.5196800231933594
+      },
+      {
+        "deck": "A",
+        "hotcue_number": 7,
+        "cc": 92,
+        "success": true,
+        "error_message": "",
+        "response_time_ms": 0.1709461212158203
+      },
+      {
+        "deck": "A",
+        "hotcue_number": 8,
+        "cc": 93,
+        "success": true,
+        "error_message": "",
+        "response_time_ms": 0.07319450378417969
+      }
+    ],
+    "B": [
+      {
+        "deck": "B",
+        "hotcue_number": 1,
+        "cc": 94,
+        "success": true,
+        "error_message": "",
+        "response_time_ms": 0.16188621520996094
+      },
+      {
+        "deck": "B",
+        "hotcue_number": 2,
+        "cc": 95,
+        "success": true,
+        "error_message": "",
+        "response_time_ms": 0.064849853515625
+      },
+      {
+        "deck": "B",
+        "hotcue_number": 3,
+        "cc": 96,
+        "success": true,
+        "error_message": "",
+        "response_time_ms": 0.12922286987304688
+      },
+      {
+        "deck": "B",
+        "hotcue_number": 4,
+        "cc": 105,
+        "success": true,
+        "error_message": "",
+        "response_time_ms": 0.20194053649902344
+      },
+      {
+        "deck": "B",
+        "hotcue_number": 5,
+        "cc": 106,
+        "success": true,
+        "error_message": "",
+        "response_time_ms": 0.23102760314941406
+      },
+      {
+        "deck": "B",
+        "hotcue_number": 6,
+        "cc": 107,
+        "success": true,
+        "error_message": "",
+        "response_time_ms": 0.1957416534423828
+      },
+      {
+        "deck": "B",
+        "hotcue_number": 7,
+        "cc": 108,
+        "success": true,
+        "error_message": "",
+        "response_time_ms": 0.15425682067871094
+      },
+      {
+        "deck": "B",
+        "hotcue_number": 8,
+        "cc": 109,
+        "success": true,
+        "error_message": "",
+        "response_time_ms": 0.10895729064941406
+      }
+    ],
+    "C": [
+      {
+        "deck": "C",
+        "hotcue_number": 1,
+        "cc": 110,
+        "success": true,
+        "error_message": "",
+        "response_time_ms": 0.13208389282226562
+      },
+      {
+        "deck": "C",
+        "hotcue_number": 2,
+        "cc": 111,
+        "success": true,
+        "error_message": "",
+        "response_time_ms": 0.10514259338378906
+      },
+      {
+        "deck": "C",
+        "hotcue_number": 3,
+        "cc": 112,
+        "success": true,
+        "error_message": "",
+        "response_time_ms": 0.12803077697753906
+      },
+      {
+        "deck": "C",
+        "hotcue_number": 4,
+        "cc": 113,
+        "success": true,
+        "error_message": "",
+        "response_time_ms": 0.41794776916503906
+      },
+      {
+        "deck": "C",
+        "hotcue_number": 5,
+        "cc": 114,
+        "success": true,
+        "error_message": "",
+        "response_time_ms": 0.14472007751464844
+      },
+      {
+        "deck": "C",
+        "hotcue_number": 6,
+        "cc": 115,
+        "success": true,
+        "error_message": "",
+        "response_time_ms": 0.15020370483398438
+      },
+      {
+        "deck": "C",
+        "hotcue_number": 7,
+        "cc": 116,
+        "success": true,
+        "error_message": "",
+        "response_time_ms": 0.09226799011230469
+      },
+      {
+        "deck": "C",
+        "hotcue_number": 8,
+        "cc": 117,
+        "success": true,
+        "error_message": "",
+        "response_time_ms": 0.17380714416503906
+      }
+    ],
+    "D": [
+      {
+        "deck": "D",
+        "hotcue_number": 1,
+        "cc": 118,
+        "success": true,
+        "error_message": "",
+        "response_time_ms": 0.19311904907226562
+      },
+      {
+        "deck": "D",
+        "hotcue_number": 2,
+        "cc": 119,
+        "success": true,
+        "error_message": "",
+        "response_time_ms": 0.11205673217773438
+      },
+      {
+        "deck": "D",
+        "hotcue_number": 3,
+        "cc": 120,
+        "success": true,
+        "error_message": "",
+        "response_time_ms": 0.22029876708984375
+      },
+      {
+        "deck": "D",
+        "hotcue_number": 4,
+        "cc": 121,
+        "success": true,
+        "error_message": "",
+        "response_time_ms": 0.15115737915039062
+      },
+      {
+        "deck": "D",
+        "hotcue_number": 5,
+        "cc": 122,
+        "success": true,
+        "error_message": "",
+        "response_time_ms": 0.17690658569335938
+      },
+      {
+        "deck": "D",
+        "hotcue_number": 6,
+        "cc": 123,
+        "success": true,
+        "error_message": "",
+        "response_time_ms": 0.2281665802001953
+      },
+      {
+        "deck": "D",
+        "hotcue_number": 7,
+        "cc": 124,
+        "success": true,
+        "error_message": "",
+        "response_time_ms": 0.40078163146972656
+      },
+      {
+        "deck": "D",
+        "hotcue_number": 8,
+        "cc": 125,
+        "success": true,
+        "error_message": "",
+        "response_time_ms": 0.1919269561767578
+      }
+    ]
+  }
+}

@@ -17,7 +17,7 @@ from dataclasses import dataclass, asdict
 import sys
 from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent))
-from config import OPENROUTER_BASE_URL, OPENROUTER_HEADERS, FREE_MODELS
+from .config import OPENROUTER_BASE_URL, OPENROUTER_HEADERS, FREE_MODELS
 
 logger = logging.getLogger(__name__)
 

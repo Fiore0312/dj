@@ -82,21 +82,35 @@ class TraktorController:
     # See: TRAKTOR_ACTUAL_CC_MAPPINGS.md and MIDI_MAPPING_OPTIMIZATION_COMPLETE.md
     MIDI_MAP = {
         # ===== TRANSPORT CONTROLS =====
-        'deck_a_play': (MIDIChannel.AI_CONTROL.value, 20),  # ✅ CONFIRMED
-        'deck_b_play': (MIDIChannel.AI_CONTROL.value, 21),  # ✅ CONFIRMED
+        'deck_a_play': (MIDIChannel.AI_CONTROL.value, 47),  # ✅ FIXED CONFLICT (was 20)
+        'deck_b_play': (MIDIChannel.AI_CONTROL.value, 48),  # ✅ FIXED CONFLICT (was 21)
         'deck_c_play': (MIDIChannel.AI_CONTROL.value, 22),  # ✅ CONFIRMED
         'deck_d_play': (MIDIChannel.AI_CONTROL.value, 23),  # ✅ CONFIRMED
         'deck_a_cue': (MIDIChannel.AI_CONTROL.value, 80),  # 🔄 TO TEST
         'deck_b_cue': (MIDIChannel.AI_CONTROL.value, 81),  # 🔄 TO TEST
-        'deck_a_sync': (MIDIChannel.AI_CONTROL.value, 24),  # 🔄 TO TEST
+        'deck_a_sync': (MIDIChannel.AI_CONTROL.value, 69),  # ✅ FIXED CONFLICT (was 41→24)
         'deck_b_sync': (MIDIChannel.AI_CONTROL.value, 25),  # 🔄 TO TEST
+        'deck_c_sync': (MIDIChannel.AI_CONTROL.value, 70),  # ✅ FIXED CONFLICT (was 43)
+        'deck_d_sync': (MIDIChannel.AI_CONTROL.value, 71),  # ✅ FIXED CONFLICT (was 44)
 
         # ===== VOLUME CONTROLS =====
-        'deck_a_volume': (MIDIChannel.AI_CONTROL.value, 28),  # ✅ CONFIRMED
+        'deck_a_volume': (MIDIChannel.AI_CONTROL.value, 65),  # ✅ FIXED CONFLICT (was 28)
         'deck_b_volume': (MIDIChannel.AI_CONTROL.value, 60),  # ✅ CONFIRMED
         'deck_c_volume': (MIDIChannel.AI_CONTROL.value, 30),  # ✅ CONFIRMED
         'deck_d_volume': (MIDIChannel.AI_CONTROL.value, 31),  # ✅ CONFIRMED
         'crossfader': (MIDIChannel.AI_CONTROL.value, 32),  # 🔄 TO TEST
+
+        # ===== VOLUME ADJUST (GAIN/TRIM) =====
+        'deck_a_gain': (MIDIChannel.AI_CONTROL.value, 8),   # ✅ VOLUME ADJUST
+        'deck_b_gain': (MIDIChannel.AI_CONTROL.value, 9),   # ✅ VOLUME ADJUST
+        'deck_c_gain': (MIDIChannel.AI_CONTROL.value, 10),  # ✅ VOLUME ADJUST
+        'deck_d_gain': (MIDIChannel.AI_CONTROL.value, 11),  # ✅ VOLUME ADJUST
+
+        # ===== MASTER CONTROLS =====
+        'deck_a_master': (MIDIChannel.AI_CONTROL.value, 33),  # ✅ NEW MASTER CONTROL
+        'deck_b_master': (MIDIChannel.AI_CONTROL.value, 37),  # ✅ NEW MASTER CONTROL
+        'deck_c_master': (MIDIChannel.AI_CONTROL.value, 38),  # ✅ NEW MASTER CONTROL
+        'deck_d_master': (MIDIChannel.AI_CONTROL.value, 39),  # ✅ NEW MASTER CONTROL
 
         # ===== EQ CONTROLS =====
         'deck_a_eq_high': (MIDIChannel.AI_CONTROL.value, 34),  # ✅ CONFIRMED
@@ -244,6 +258,9 @@ class TraktorController:
         # Threading per status updates
         self.status_thread: Optional[threading.Thread] = None
         self.running = False
+
+        # MASTER deck tracking per mixing professionale
+        self._master_deck_state: Optional[DeckID] = None
 
         # Stato deck interno per tracking play/pause
         self.deck_states = {
@@ -586,11 +603,107 @@ class TraktorController:
         channel, cc = self.MIDI_MAP[f'deck_{deck.value.lower()}_volume']
         return self._send_midi_command(channel, cc, midi_value, f"Deck {deck.value} Volume")
 
+    def set_deck_gain(self, deck: DeckID, gain: float) -> bool:
+        """Set VOLUME ADJUST (gain/trim) - separate from volume fader (0.0-1.0, 1.0=100%)"""
+        midi_value = int(gain * 127)
+        channel, cc = self.MIDI_MAP[f'deck_{deck.value.lower()}_gain']
+        return self._send_midi_command(channel, cc, midi_value, f"Deck {deck.value} GAIN/TRIM")
+
     def set_crossfader(self, position: float) -> bool:
         """Imposta crossfader (0.0=A, 1.0=B)"""
         midi_value = int(position * 127)
         channel, cc = self.MIDI_MAP['crossfader']
         return self._send_midi_command(channel, cc, midi_value, "Crossfader")
+
+    # ===== MASTER CONTROL METHODS =====
+    def set_deck_master(self, deck: DeckID, active: bool) -> bool:
+        """Imposta/disimposta deck come MASTER (controllo tempo)"""
+        midi_value = 127 if active else 0
+        key = f'deck_{deck.value.lower()}_master'
+        if key in self.MIDI_MAP:
+            channel, cc = self.MIDI_MAP[key]
+            success = self._send_midi_command(channel, cc, midi_value, f"Deck {deck.value} MASTER {'ON' if active else 'OFF'}")
+            if success and hasattr(self, '_master_deck_state'):
+                if active:
+                    self._master_deck_state = deck
+                elif self._master_deck_state == deck:
+                    self._master_deck_state = None
+            return success
+        return False
+
+    def get_current_master_deck(self) -> Optional[DeckID]:
+        """Ritorna il deck attualmente MASTER"""
+        return getattr(self, '_master_deck_state', None)
+
+    def transfer_master(self, from_deck: DeckID, to_deck: DeckID) -> bool:
+        """Trasferisce controllo MASTER da un deck all'altro (per mixing professionale)"""
+        logger.info(f"🔄 Trasferimento MASTER: {from_deck.value} → {to_deck.value}")
+
+        # 1. Attiva MASTER sul nuovo deck
+        if not self.set_deck_master(to_deck, True):
+            logger.error(f"❌ Impossibile attivare MASTER su Deck {to_deck.value}")
+            return False
+
+        # 2. Disattiva MASTER sul vecchio deck
+        if not self.set_deck_master(from_deck, False):
+            logger.warning(f"⚠️ Problema disattivazione MASTER su Deck {from_deck.value}")
+            # Continua comunque, il nuovo MASTER è attivo
+
+        logger.info(f"✅ MASTER trasferito: {from_deck.value} → {to_deck.value}")
+        return True
+
+    def activate_deck_master(self, deck: DeckID) -> bool:
+        """
+        Professional MASTER activation using CORRECT 3-step sequence:
+        1. PLAY → Start track playback
+        2. VOLUME ADJUST → Set to maximum (127/100%)
+        3. MASTER → Activate MASTER button
+
+        This is the standard DJ workflow - track must be playing at proper gain before MASTER.
+        """
+        logger.info(f"🎯 Professional MASTER activation for Deck {deck.value}")
+
+        # STEP 1: PLAY → Start track playback
+        logger.info(f"🎵 Step 1/3: Starting playback on Deck {deck.value}")
+        if not self.force_play_deck(deck, wait_if_recent_load=True):
+            logger.error(f"❌ Failed to start playback on Deck {deck.value}")
+            return False
+
+        # Brief pause for playback to stabilize
+        time.sleep(0.5)
+
+        # STEP 2: VOLUME ADJUST → Set to maximum (127/100%)
+        logger.info(f"🔊 Step 2/3: Setting VOLUME ADJUST to maximum on Deck {deck.value}")
+        if not self.set_deck_gain(deck, 1.0):  # 100%
+            logger.warning(f"⚠️ VOLUME ADJUST failed, continuing with MASTER activation")
+
+        # Brief pause for gain to settle
+        time.sleep(0.3)
+
+        # STEP 3: MASTER → Activate MASTER button
+        logger.info(f"👑 Step 3/3: Activating MASTER on Deck {deck.value}")
+        if not self.set_deck_master(deck, True):
+            logger.error(f"❌ Failed to activate MASTER on Deck {deck.value}")
+            return False
+
+        logger.info(f"🎉 Professional MASTER activation completed for Deck {deck.value}")
+        return True
+
+    def sync_deck_to_master(self, slave_deck: DeckID) -> bool:
+        """Sincronizza deck al tempo MASTER"""
+        key = f'deck_{slave_deck.value.lower()}_sync'
+        if key in self.MIDI_MAP:
+            channel, cc = self.MIDI_MAP[key]
+            return self._send_midi_command(channel, cc, 127, f"Deck {slave_deck.value} SYNC ON")
+        return False
+
+    def unsync_deck(self, deck: DeckID) -> bool:
+        """Disattiva SYNC per deck"""
+        key = f'deck_{deck.value.lower()}_sync'
+        if key in self.MIDI_MAP:
+            channel, cc = self.MIDI_MAP[key]
+            return self._send_midi_command(channel, cc, 0, f"Deck {deck.value} SYNC OFF")
+        return False
 
     def set_eq(self, deck: DeckID, eq_type: str, value: float) -> bool:
         """Imposta EQ (eq_type: 'high'/'mid'/'low', value: 0.0-1.0, 0.5=neutro)"""
@@ -881,14 +994,19 @@ class TraktorController:
     def load_track_to_deck(self, deck: DeckID) -> bool:
         """Carica la traccia selezionata nel deck specificato"""
         try:
-            # Use new browser_load_deck naming
+            # Use consistent browser_load_deck naming for all decks
             if deck == DeckID.A:
                 channel, cc = self.MIDI_MAP['browser_load_deck_a']
             elif deck == DeckID.B:
                 channel, cc = self.MIDI_MAP['browser_load_deck_b']
+            elif deck == DeckID.C:
+                channel, cc = self.MIDI_MAP['browser_load_deck_c']
+            elif deck == DeckID.D:
+                channel, cc = self.MIDI_MAP['browser_load_deck_d']
             else:
-                # Fallback to legacy naming for C/D
-                channel, cc = self.MIDI_MAP[f'deck_{deck.value.lower()}_load_selected']
+                logger.error(f"❌ Invalid deck ID: {deck}")
+                return False
+
             success = self._send_midi_command(channel, cc, 127, f"Load track to Deck {deck.value}")
 
             if success:
@@ -906,29 +1024,29 @@ class TraktorController:
                 logger.error(f"❌ Errore caricamento traccia nel Deck {deck.value}")
 
             return success
-        except KeyError:
-            logger.error(f"❌ Comando load non disponibile per Deck {deck.value}")
+        except KeyError as e:
+            logger.error(f"❌ Comando load non disponibile per Deck {deck.value}: {e}")
             return False
 
     def browse_track_up(self) -> bool:
-        """Naviga verso l'alto nel browser"""
-        channel, cc = self.MIDI_MAP['browser_up']
-        return self._send_midi_command(channel, cc, 127, "Browser Scroll Up")
+        """Naviga verso l'alto nel browser usando browser_select_up_down"""
+        channel, cc = self.MIDI_MAP['browser_select_up_down']
+        return self._send_midi_command(channel, cc, 1, "Browser Scroll Up")  # Valore basso per UP
 
     def browse_track_down(self) -> bool:
-        """Naviga verso il basso nel browser"""
-        channel, cc = self.MIDI_MAP['browser_down']
-        return self._send_midi_command(channel, cc, 127, "Browser Scroll Down")
+        """Naviga verso il basso nel browser usando browser_select_up_down"""
+        channel, cc = self.MIDI_MAP['browser_select_up_down']
+        return self._send_midi_command(channel, cc, 127, "Browser Scroll Down")  # Valore alto per DOWN
 
     def select_browser_item(self) -> bool:
-        """Seleziona item corrente nel browser"""
-        channel, cc = self.MIDI_MAP['browser_select_item']
+        """Seleziona item corrente nel browser - usa expand/collapse come trigger"""
+        channel, cc = self.MIDI_MAP['browser_expand_collapse']
         return self._send_midi_command(channel, cc, 127, "Browser Select Item")
 
     def browser_back(self) -> bool:
-        """Torna indietro nel browser"""
-        channel, cc = self.MIDI_MAP['browser_back']
-        return self._send_midi_command(channel, cc, 127, "Browser Back")
+        """Torna indietro nel browser tree usando browser_tree_up_down"""
+        channel, cc = self.MIDI_MAP['browser_tree_up_down']
+        return self._send_midi_command(channel, cc, 1, "Browser Tree Back")
 
     def load_next_track(self, target_deck: DeckID, direction: str = "down") -> bool:
         """
@@ -1143,14 +1261,18 @@ class TraktorController:
     def _load_track_to_deck_with_tracking(self, deck: DeckID, browser_position: int) -> bool:
         """Carica traccia con tracking avanzato della posizione"""
         try:
-            # Use new browser_load_deck naming
+            # Use consistent browser_load_deck naming for all decks
             if deck == DeckID.A:
                 channel, cc = self.MIDI_MAP['browser_load_deck_a']
             elif deck == DeckID.B:
                 channel, cc = self.MIDI_MAP['browser_load_deck_b']
+            elif deck == DeckID.C:
+                channel, cc = self.MIDI_MAP['browser_load_deck_c']
+            elif deck == DeckID.D:
+                channel, cc = self.MIDI_MAP['browser_load_deck_d']
             else:
-                # Fallback to legacy naming for C/D
-                channel, cc = self.MIDI_MAP[f'deck_{deck.value.lower()}_load_selected']
+                logger.error(f"❌ Invalid deck ID: {deck}")
+                return False
 
             success = self._send_midi_command(channel, cc, 127, f"Smart Load track to Deck {deck.value}")
 
@@ -1382,31 +1504,41 @@ class TraktorController:
         return self.deck_states[deck]['cued']
 
     def mix_to_deck_b(self) -> bool:
-        """Professional transition from A to B"""
+        """Professional A→B transition with MASTER handoff using correct sequence"""
         try:
+            logger.info("🎯 Starting professional A→B mix with MASTER handoff")
+
             # Check if both decks have tracks
             if not self.deck_states[DeckID.A]['loaded'] or not self.deck_states[DeckID.B]['loaded']:
                 logger.warning("Both decks must have tracks loaded for mixing")
                 return False
 
-            # Start playing B if not already
-            if not self.deck_states[DeckID.B]['playing']:
-                self.play_deck(DeckID.B)
-                import time
-                time.sleep(0.5)  # Let it stabilize
+            # Phase 1: Activate MASTER on Deck B (professional 3-step sequence)
+            logger.info("Phase 1: Activating MASTER on Deck B (incoming track)")
+            if not self.activate_deck_master(DeckID.B):
+                logger.error("❌ Failed to activate MASTER on Deck B")
+                return False
 
-            # Gradual crossfade A → B
+            # Brief stabilization
+            time.sleep(1.0)
+
+            # Phase 2: Sync and crossfade transition
+            logger.info("Phase 2: Crossfade transition A → B")
             crossfade_steps = [0.2, 0.4, 0.6, 0.8, 1.0]
             for position in crossfade_steps:
                 self.set_crossfader(position)
-                import time
-                time.sleep(0.6)  # 600ms between steps
+                time.sleep(0.8)  # 800ms between steps
 
-            logger.info("✅ Professional mix A→B completed")
+            # Phase 3: Deactivate MASTER on Deck A (outgoing track)
+            logger.info("Phase 3: Deactivating MASTER on Deck A")
+            if not self.set_deck_master(DeckID.A, False):
+                logger.warning("⚠️ Failed to deactivate MASTER on Deck A")
+
+            logger.info("🎉 Professional A→B mix with MASTER handoff completed")
             return True
 
         except Exception as e:
-            logger.error(f"❌ Mix to deck B failed: {e}")
+            logger.error(f"❌ Professional mix A→B failed: {e}")
             return False
 
     def sync_decks(self, master_deck: DeckID, slave_deck: DeckID) -> bool:

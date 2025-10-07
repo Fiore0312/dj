@@ -735,26 +735,26 @@ class TraktorController:
         return self._send_midi_command(channel, cc, 127, "Browser Select DOWN")  # High value for DOWN
 
     def browser_tree_up(self, force_direction_value: Optional[int] = None) -> bool:
-        """Navigate UP in browser tree using browser_tree_up_down mapping
+        """Navigate UP in browser tree using CC73 (DISCOVERED working config)
 
         Args:
-            force_direction_value: Override direction value (1 or 127) for testing direction correction
+            force_direction_value: Override value for testing (default 127)
         """
-        channel, cc = self.MIDI_MAP['browser_tree_up_down']
-        # Use forced value or default UP value (1)
-        value = force_direction_value if force_direction_value is not None else 1
-        return self._send_midi_command(channel, cc, value, f"Browser Tree UP (value={value})")
+        channel, cc = self.MIDI_MAP['browser_tree_up']
+        # Always use 127 for button press (discovered config uses Button/DEC mode)
+        value = force_direction_value if force_direction_value is not None else 127
+        return self._send_midi_command(channel, cc, value, f"Browser Tree UP (CC{cc}, value={value})")
 
     def browser_tree_down(self, force_direction_value: Optional[int] = None) -> bool:
-        """Navigate DOWN in browser tree using browser_tree_up_down mapping
+        """Navigate DOWN in browser tree using CC72 (DISCOVERED working config)
 
         Args:
-            force_direction_value: Override direction value (1 or 127) for testing direction correction
+            force_direction_value: Override value for testing (default 127)
         """
-        channel, cc = self.MIDI_MAP['browser_tree_up_down']
-        # Use forced value or default DOWN value (127)
+        channel, cc = self.MIDI_MAP['browser_tree_down']
+        # Always use 127 for button press (discovered config uses Button/INC mode)
         value = force_direction_value if force_direction_value is not None else 127
-        return self._send_midi_command(channel, cc, value, f"Browser Tree DOWN (value={value})")
+        return self._send_midi_command(channel, cc, value, f"Browser Tree DOWN (CC{cc}, value={value})")
 
     # ===== MODIFIER-BASED BROWSER NAVIGATION METHODS =====
 

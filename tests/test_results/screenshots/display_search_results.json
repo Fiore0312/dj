@@ -1,0 +1,30 @@
+[
+  {
+    "display": 1,
+    "captured": true,
+    "path": "/Users/Fiore/dj/tests/test_results/screenshots/display_1.jpg",
+    "size_kb": 398.7,
+    "error": null
+  },
+  {
+    "display": 2,
+    "captured": true,
+    "path": "/Users/Fiore/dj/tests/test_results/screenshots/display_2.jpg",
+    "size_kb": 167.3,
+    "error": null
+  },
+  {
+    "display": 3,
+    "captured": false,
+    "path": null,
+    "size_kb": 0,
+    "error": "screencapture failed: screencapture: Invalid display specified. Must be a number from 1-2\n"
+  },
+  {
+    "display": 4,
+    "captured": false,
+    "path": null,
+    "size_kb": 0,
+    "error": "screencapture failed: screencapture: Invalid display specified. Must be a number from 1-2\n"
+  }
+]
